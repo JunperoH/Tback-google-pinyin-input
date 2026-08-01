@@ -1,12 +1,24 @@
-# Google 拼音输入法 创造性 AI 版
+# Google 拼音输入法 T+ 自用版
 
 **English project name: Comeback Google Pinyin Input**
 
-这是基于 Google 拼音输入法 4.5.2 的非商业兼容维护与创造性 AI 协作项目。目标是在尽量保持原始输入体验、候选逻辑、词库格式和主题行为的前提下，让这款已经停止更新的输入法继续用于 Android 16/17，并以可复现、可审计的方式维护兼容补丁。
+这是 [`huaxianyan/comeback-google-pinyin-input`](https://github.com/huaxianyan/comeback-google-pinyin-input) 的个人 fork，在其 Google 拼音输入法 4.5.2 兼容补丁之上增加触宝式 T+ 双字母布局。目标是在保持原生候选逻辑、词库格式和主题行为的前提下，以可复现、可审计的方式恢复这一输入体验。
+
+## T+ 自用分支
+
+本 fork 在上游兼容维护版本之上新增“拼音 T+ 双字母键盘”，作为与原有全键盘、九键、笔画和手写并列的可选中文输入布局。键位保持 QWERTY 空间顺序：
+
+```text
+QW  ER  TY  UI  OP
+AS  DF  GH  JK  L-
+    ZX  CV  BN  M'
+```
+
+点击双字母键会把两个字母作为等权备选送入 Google 拼音原生 HMM 引擎，由拼音和词句上下文消歧；向左或向右滑动可明确选择键上的第一个或第二个字母。长按可输入键面右下角的数字或符号。实现、APK 来源校验和已知限制见 [`docs/touchpal-tplus-port.md`](docs/touchpal-tplus-port.md)。本仓库不包含触宝 APK、图片或其他触宝程序资源。
 
 ## 下载
 
-“Google 拼音输入法 创造性 AI 版”正式构建请从项目的 [Releases](https://github.com/huaxianyan/comeback-google-pinyin-input/releases) 页面下载。Android 应用内、输入法选择器、设置页和 Launcher 中的显示名称仍保持为“Google 拼音输入法”。
+T+ 自用版构建请从本 fork 的 [Releases](https://github.com/JunperoH/comeback-google-pinyin-input/releases) 页面下载。Android 应用内、输入法选择器、设置页和 Launcher 中的显示名称仍保持为“Google 拼音输入法”。上游不带 T+ 的兼容版仍从[上游 Releases](https://github.com/huaxianyan/comeback-google-pinyin-input/releases) 获取。
 
 仓库同时保存用于复现构建的原始官方 APK：
 
@@ -29,24 +41,24 @@
 
 Google 拼音输入法最初由 Google 发布并通过 Google Play 等官方 Android 分发渠道提供。本仓库中的原始 APK 用于软件保存、兼容性研究和可复现构建，其文件哈希与签名信息列于上表，便于独立校验来源和完整性。
 
-### 最新正式版本
+### 当前 T+ 版本
 
 | 项目 | 内容 |
 | --- | --- |
-| 项目中文名称 | Google 拼音输入法 创造性 AI 版 |
+| 项目中文名称 | Google 拼音输入法 T+ 自用版 |
 | English project name | Comeback Google Pinyin Input |
-| 项目版本 | `1.0.3` |
-| Android versionName | `1.0.3` |
-| Android versionCode | `4520384` |
-| 正式包名 | `com.google.android.inputmethod.pinyin.compat` |
+| 项目版本 | `1.1.0-tplus.1` |
+| Android versionName | `1.1.0-tplus.1` |
+| Android versionCode | `4520401` |
+| 包名 | `com.google.android.inputmethod.pinyin.compat.tplus` |
 | 架构 | `arm64-v8a` |
-| 正式 APK | `ComebackGooglePinyinInput-arm64-v8a-1.0.3.apk` |
+| APK | `ComebackGooglePinyinInput-TPlus-arm64-v8a-1.1.0-tplus.1.apk` |
 | target SDK | 28 |
-| 主要测试设备 | Pixel 10 Pro / Android 16 |
+| 验证状态 | apktool 2.12.1 完整重建通过；等待真机输入测试 |
 
-上表对应正式 Release `v1.0.3`：备份和导入位置继续支持内部存储、SD 卡及 Google Drive 等 DocumentsProvider，同时移除失效的 Google 账户词典同步请求，并保留本地“清除用户字典”功能。后续 `master` 仍可能包含尚未发布的研究或兼容修复；是否发布以 GitHub Release 和 `CHANGELOG.md` 为准。
+`1.1.0-tplus.1` 继承上游 `v1.0.3` 的兼容、词典备份和失效服务清理，并增加 T+ 布局。是否发布以本 fork 的 GitHub Release 和 `CHANGELOG.md` 为准。
 
-创造性 AI 版使用独立包名和项目签名证书，可以与 Google 原始版本同时安装。以后升级时必须继续使用同一签名证书；它不能覆盖由 Google 官方证书签名的原始应用。
+T+ 自用版使用独立包名和独立签名证书，可以与 Google 原版及上游兼容版同时安装。以后升级时必须继续使用同一签名证书；它不能覆盖由 Google 或上游证书签名的应用。
 
 ## 主要兼容改进
 
@@ -93,6 +105,7 @@ patches/
 scripts/
   apply_patches.py                                    可复现补丁流程
   build.ps1                                           Windows 构建脚本
+  verify_tplus.py                                     T+ 键位与注入静态校验
 docs/                                                 调查、设计与测试记录
 CHANGELOG.md                                          版本变更记录
 ```
@@ -122,6 +135,12 @@ PowerShell 示例：
 
 补丁脚本会从原始 APK 解码、应用资源及 smali 改动、修改为独立包名，然后重建、对齐并签名。
 
+可单独检查 T+ 的 26 字母覆盖、键位顺序、滑动映射和注入结果；传入已打补丁的 apktool 目录时还会检查 IME 注册和 smali 分支：
+
+```powershell
+python scripts/verify_tplus.py work/decoded
+```
+
 ## GitHub Actions 自动构建与发布
 
 工作流位于 [`.github/workflows/build-release.yml`](.github/workflows/build-release.yml)：
@@ -132,7 +151,7 @@ PowerShell 示例：
 
 ### 签名一致性
 
-Android 是否允许覆盖升级取决于**签名证书身份**，而不是 APK 文件名。自动构建必须使用与现有正式创造性 AI 版完全相同的 PKCS#12/JKS 私钥。私钥和密码不能写进仓库或普通 Actions Variables，应存入 GitHub Actions **Secrets**：
+Android 是否允许覆盖升级取决于**签名证书身份**，而不是 APK 文件名。本 fork 的自动构建必须始终使用第一次 T+ 构建所用的 PKCS#12/JKS 私钥。私钥和密码不能写进仓库或普通 Actions Variables，应存入 GitHub Actions **Secrets**；本机副本位于 Git 忽略的 `work/signing/`，需要另外安全备份。
 
 | GitHub Secret | 内容 |
 | --- | --- |
@@ -144,9 +163,9 @@ Android 是否允许覆盖升级取决于**签名证书身份**，而不是 APK 
 
 | GitHub Variable | 正式值 |
 | --- | --- |
-| `ANDROID_SIGNING_KEY_ALIAS` | `google-pinyin-test` |
-| `ANDROID_SIGNING_CERT_SHA256` | `985CBF843A362169B129AEAC5E153D13095F0923231936D1486A20C8332CDE2F` |
-| `ANDROID_APPLICATION_ID` | `com.google.android.inputmethod.pinyin.compat` |
+| `ANDROID_SIGNING_KEY_ALIAS` | `google-pinyin-tplus` |
+| `ANDROID_SIGNING_CERT_SHA256` | `0FA3AD8C58A98FD550D37D787FEACC573F2E8A7AC71207667BDFBF0D9124D250` |
+| `ANDROID_APPLICATION_ID` | `com.google.android.inputmethod.pinyin.compat.tplus` |
 
 工作流在构建前使用 `keytool` 读取恢复出的证书指纹，并与 `ANDROID_SIGNING_CERT_SHA256` 比较。证书不一致、密码错误、alias 错误或任何配置缺失都会立即终止，因此不会误发一个无法覆盖升级的 APK。原始 APK、apktool 和签名工具也分别执行固定 SHA-256 校验。
 
@@ -162,7 +181,7 @@ gh auth login
 
 ```powershell
 [Convert]::ToBase64String(
-  [IO.File]::ReadAllBytes("work/test-signing.p12")
+  [IO.File]::ReadAllBytes("work/signing/tplus-local.p12")
 ) | gh secret set ANDROID_SIGNING_KEYSTORE_BASE64
 ```
 
@@ -176,16 +195,16 @@ gh secret set ANDROID_SIGNING_KEY_PASSWORD
 设置非敏感变量：
 
 ```powershell
-gh variable set ANDROID_SIGNING_KEY_ALIAS --body "google-pinyin-test"
-gh variable set ANDROID_SIGNING_CERT_SHA256 --body "985CBF843A362169B129AEAC5E153D13095F0923231936D1486A20C8332CDE2F"
-gh variable set ANDROID_APPLICATION_ID --body "com.google.android.inputmethod.pinyin.compat"
+gh variable set ANDROID_SIGNING_KEY_ALIAS --body "google-pinyin-tplus"
+gh variable set ANDROID_SIGNING_CERT_SHA256 --body "0FA3AD8C58A98FD550D37D787FEACC573F2E8A7AC71207667BDFBF0D9124D250"
+gh variable set ANDROID_APPLICATION_ID --body "com.google.android.inputmethod.pinyin.compat.tplus"
 ```
 
-配置后可在 GitHub 的 **Actions → Build and release APK → Run workflow** 手动验证一次。确认 artifact 能安装并覆盖正式创造性 AI 版后，以新版本提交创建标签：
+配置后可在 GitHub 的 **Actions → Build and release APK → Run workflow** 手动验证一次。确认 artifact 能安装并覆盖上一版 T+ 自用版后，以新版本提交创建标签：
 
 ```powershell
-git tag -a v1.0.3 -m "ComebackGooglePinyinInput 1.0.3"
-git push origin v1.0.3
+git tag -a v1.1.0-tplus.1 -m "Comeback Google Pinyin Input T+ 1.1.0-tplus.1"
+git push origin v1.1.0-tplus.1
 ```
 
 标签推送后无需在本地构建或上传 APK。`GITHUB_TOKEN` 由 Actions 自动提供，只授予工作流创建 Release 所需的 `contents: write` 权限。

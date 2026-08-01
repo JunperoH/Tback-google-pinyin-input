@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="pinyin_tplus_ime_label">Pinyin T+ dual-letter keyboard</string>
+
+    <item type="id" name="keyboard_zh_cn_pinyin_tplus" />
+    <item type="id" name="softkey_template_tplus_pair" />
+    <item type="id" name="softkey_template_tplus_pair_upper" />
+
+    <item type="id" name="key_pos_tplus_qw" />
+    <item type="id" name="key_pos_tplus_er" />
+    <item type="id" name="key_pos_tplus_ty" />
+    <item type="id" name="key_pos_tplus_ui" />
+    <item type="id" name="key_pos_tplus_op" />
+    <item type="id" name="key_pos_tplus_as" />
+    <item type="id" name="key_pos_tplus_df" />
+    <item type="id" name="key_pos_tplus_gh" />
+    <item type="id" name="key_pos_tplus_jk" />
+    <item type="id" name="key_pos_tplus_l" />
+    <item type="id" name="key_pos_tplus_zx" />
+    <item type="id" name="key_pos_tplus_cv" />
+    <item type="id" name="key_pos_tplus_bn" />
+    <item type="id" name="key_pos_tplus_m" />
+
+    <item type="id" name="softkey_tplus_qw" />
+    <item type="id" name="softkey_tplus_er" />
+    <item type="id" name="softkey_tplus_ty" />
+    <item type="id" name="softkey_tplus_ui" />
+    <item type="id" name="softkey_tplus_op" />
+    <item type="id" name="softkey_tplus_as" />
+    <item type="id" name="softkey_tplus_df" />
+    <item type="id" name="softkey_tplus_gh" />
+    <item type="id" name="softkey_tplus_jk" />
+    <item type="id" name="softkey_tplus_l" />
+    <item type="id" name="softkey_tplus_zx" />
+    <item type="id" name="softkey_tplus_cv" />
+    <item type="id" name="softkey_tplus_bn" />
+    <item type="id" name="softkey_tplus_m" />
+
+    <item type="id" name="softkey_tplus_up_qw" />
+    <item type="id" name="softkey_tplus_up_er" />
+    <item type="id" name="softkey_tplus_up_ty" />
+    <item type="id" name="softkey_tplus_up_ui" />
+    <item type="id" name="softkey_tplus_up_op" />
+    <item type="id" name="softkey_tplus_up_as" />
+    <item type="id" name="softkey_tplus_up_df" />
+    <item type="id" name="softkey_tplus_up_gh" />
+    <item type="id" name="softkey_tplus_up_jk" />
+    <item type="id" name="softkey_tplus_up_l" />
+    <item type="id" name="softkey_tplus_up_zx" />
+    <item type="id" name="softkey_tplus_up_cv" />
+    <item type="id" name="softkey_tplus_up_bn" />
+    <item type="id" name="softkey_tplus_up_m" />
+</resources>

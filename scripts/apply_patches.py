@@ -46,8 +46,8 @@ def apply(decoded: Path, application_id: str) -> None:
     replace_once(
         decoded / "apktool.yml",
         "versionInfo:\n  versionCode: 4520313\n  versionName: 4.5.2.193126728-arm64-v8a",
-        "versionInfo:\n  versionCode: 4520384\n"
-        "  versionName: 1.0.3",
+        "versionInfo:\n  versionCode: 4520401\n"
+        "  versionName: 1.1.0-tplus.1",
     )
 
     arrays = decoded / "res/values/arrays.xml"
@@ -86,6 +86,112 @@ def apply(decoded: Path, application_id: str) -> None:
         if destination.exists() and source.name not in overwritten_layouts:
             raise RuntimeError(f"Refusing to overwrite resource: {destination}")
         shutil.copyfile(source, destination)
+
+    # Register T+ alongside the original QWERTY, 9-key, stroke and handwriting
+    # Chinese IMEs. The dashboard discovers available layouts from this list.
+    replace_once(
+        decoded / "res/xml/framework_chinese_soft.xml",
+        "    <include href=\"@xml/ime_zh_cn_pinyin_qwerty\" />\n"
+        "    <include href=\"@xml/ime_zh_cn_pinyin_9key\" />",
+        "    <include href=\"@xml/ime_zh_cn_pinyin_qwerty\" />\n"
+        "    <include href=\"@xml/ime_zh_cn_pinyin_9key\" />\n"
+        "    <include href=\"@xml/ime_zh_cn_pinyin_tplus\" />",
+    )
+
+    # Reuse the original T9 HMM path, but expand a T+ press into the two
+    # same-score QWERTY letters represented by that key. Regular 9-key digit
+    # mapping remains unchanged.
+    t9_processor = decoded / (
+        "smali/com/google/android/apps/inputmethod/pinyin/ime/hmm/"
+        "HmmPinyinT9DecodeProcessor.smali"
+    )
+    replace_once(
+        t9_processor,
+        "    :cond_2\n"
+        "    invoke-static {v2}, Lcom/google/android/apps/inputmethod/libs/hmm/"
+        "T9KeyMapping;->containsKey(Lcom/google/android/apps/inputmethod/libs/"
+        "framework/core/KeyData;)Z\n\n"
+        "    move-result v0\n\n"
+        "    if-eqz v0, :cond_3\n\n"
+        "    .line 28\n"
+        "    invoke-static {}, Lcom/google/android/apps/inputmethod/libs/framework/"
+        "core/Event;->b()Lcom/google/android/apps/inputmethod/libs/framework/core/"
+        "Event;\n\n"
+        "    move-result-object v0\n\n"
+        "    invoke-virtual {v0}, Lcom/google/android/apps/inputmethod/libs/"
+        "framework/core/Event;->a()Lcom/google/android/apps/inputmethod/libs/"
+        "framework/core/Event;\n\n"
+        "    move-result-object v1\n\n"
+        "    .line 30\n"
+        "    invoke-static {v2, v4}, Lcom/google/android/apps/inputmethod/libs/hmm/"
+        "T9KeyMapping;->mapKeyData(Lcom/google/android/apps/inputmethod/libs/"
+        "framework/core/KeyData;Z)[Lcom/google/android/apps/inputmethod/libs/"
+        "framework/core/KeyData;\n\n"
+        "    move-result-object v0\n\n"
+        "    .line 31\n"
+        "    invoke-static {v2}, Lcom/google/android/apps/inputmethod/libs/hmm/"
+        "T9KeyMapping;->mapScores(Lcom/google/android/apps/inputmethod/libs/"
+        "framework/core/KeyData;)[F\n\n"
+        "    move-result-object v2",
+        "    :cond_2\n"
+        "    invoke-static {v2}, Lcom/google/android/apps/inputmethod/libs/hmm/"
+        "TPlusKeyMapping;->containsKey(Lcom/google/android/apps/inputmethod/libs/"
+        "framework/core/KeyData;)Z\n\n"
+        "    move-result v0\n\n"
+        "    if-eqz v0, :check_t9_mapping\n\n"
+        "    const/4 v3, 0x1\n\n"
+        "    goto :ambiguous_mapping\n\n"
+        "    :check_t9_mapping\n"
+        "    invoke-static {v2}, Lcom/google/android/apps/inputmethod/libs/hmm/"
+        "T9KeyMapping;->containsKey(Lcom/google/android/apps/inputmethod/libs/"
+        "framework/core/KeyData;)Z\n\n"
+        "    move-result v0\n\n"
+        "    if-eqz v0, :cond_3\n\n"
+        "    const/4 v3, 0x0\n\n"
+        "    :ambiguous_mapping\n"
+        "    .line 28\n"
+        "    invoke-static {}, Lcom/google/android/apps/inputmethod/libs/framework/"
+        "core/Event;->b()Lcom/google/android/apps/inputmethod/libs/framework/core/"
+        "Event;\n\n"
+        "    move-result-object v0\n\n"
+        "    invoke-virtual {v0}, Lcom/google/android/apps/inputmethod/libs/"
+        "framework/core/Event;->a()Lcom/google/android/apps/inputmethod/libs/"
+        "framework/core/Event;\n\n"
+        "    move-result-object v1\n\n"
+        "    if-eqz v3, :map_t9_key\n\n"
+        "    invoke-static {v2}, Lcom/google/android/apps/inputmethod/libs/hmm/"
+        "TPlusKeyMapping;->mapKeyData(Lcom/google/android/apps/inputmethod/libs/"
+        "framework/core/KeyData;)[Lcom/google/android/apps/inputmethod/libs/"
+        "framework/core/KeyData;\n\n"
+        "    move-result-object v0\n\n"
+        "    invoke-static {v2}, Lcom/google/android/apps/inputmethod/libs/hmm/"
+        "TPlusKeyMapping;->mapScores(Lcom/google/android/apps/inputmethod/libs/"
+        "framework/core/KeyData;)[F\n\n"
+        "    move-result-object v2\n\n"
+        "    goto :mapping_ready\n\n"
+        "    :map_t9_key\n"
+        "    .line 30\n"
+        "    invoke-static {v2, v4}, Lcom/google/android/apps/inputmethod/libs/hmm/"
+        "T9KeyMapping;->mapKeyData(Lcom/google/android/apps/inputmethod/libs/"
+        "framework/core/KeyData;Z)[Lcom/google/android/apps/inputmethod/libs/"
+        "framework/core/KeyData;\n\n"
+        "    move-result-object v0\n\n"
+        "    .line 31\n"
+        "    invoke-static {v2}, Lcom/google/android/apps/inputmethod/libs/hmm/"
+        "T9KeyMapping;->mapScores(Lcom/google/android/apps/inputmethod/libs/"
+        "framework/core/KeyData;)[F\n\n"
+        "    move-result-object v2\n\n"
+        "    :mapping_ready",
+    )
+
+    tplus_mapping_src = ROOT / "patches/smali/TPlusKeyMapping.smali"
+    tplus_mapping_dst = decoded / (
+        "smali/com/google/android/apps/inputmethod/libs/hmm/TPlusKeyMapping.smali"
+    )
+    if tplus_mapping_dst.exists():
+        raise RuntimeError(f"Refusing to overwrite existing helper: {tplus_mapping_dst}")
+    tplus_mapping_dst.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(tplus_mapping_src, tplus_mapping_dst)
 
     # Do not launch a transparent permission Activity from the IME service.
     # Runtime permission requests made from a real settings Activity continue
@@ -1755,7 +1861,7 @@ def main() -> None:
     parser.add_argument("decoded", type=Path, help="apktool decoded directory")
     parser.add_argument(
         "--application-id",
-        default="com.google.android.inputmethod.pinyin.compat",
+        default="com.google.android.inputmethod.pinyin.compat.tplus",
         help="application ID for coexistence builds",
     )
     args = parser.parse_args()

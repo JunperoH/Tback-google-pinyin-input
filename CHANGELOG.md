@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.1.0-tplus.1] - 2026-08-01
+
+### Added
+
+- 新增“拼音 T+ 双字母键盘”，与全键盘、九键、笔画和手写布局并列显示。
+- 按触宝 T+ 的 QWERTY 空间顺序重建 `QW/ER/TY/UI/OP`、`AS/DF/GH/JK/L-`、`ZX/CV/BN/M'` 键位。
+- 将一次双字母按键展开为两个等权 `KeyData`，复用原 Google 拼音 T9 HMM 解码、候选、用户词典和上下文预测管线。
+- 支持左右滑动明确选择单个字母，以及长按输入键面数字或符号。
+
+### Changed
+
+- T+ 默认包名改为 `com.google.android.inputmethod.pinyin.compat.tplus`，可与上游兼容版并存。
+- 记录触宝 5.7.9.0 APK 的 SHA-256、公开参考资料、独立重建边界和验证状态；不分发触宝 APK 或资源。
+- 新增 T+ 静态校验脚本，并将键位覆盖、IME 注册和解码器注入检查接入 GitHub Actions。
+
 ## [1.0.3] - 2026-08-01
 
 ### Fixed
