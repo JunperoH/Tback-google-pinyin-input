@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<framework>
+    <softkeys>
+        <softkey_template id="@id/softkey_template_tplus_pair" layout="@layout/softkey_9key" slide_sensitivity="LESS" popup_timing="ON_GESTURE" multi_touch="false" content_description="$key_text$">
+            <action type="PRESS" data="$press_data$" keycode="$keycode_press$" intention="DECODE" />
+            <action type="LONG_PRESS" data="$alternate_data$" keycode="PLAIN_TEXT" intention="COMMIT" popup_label="$alternate_data$" popup_layout="@attr/PopupBubbleRectangularSmallLayout" />
+            <action type="SLIDE_LEFT" data="$left_data$" keycode="$keycode_left$" intention="DECODE" popup_label="$left_data$" />
+            <action type="SLIDE_RIGHT" data="$right_data$" keycode="$keycode_right$" intention="DECODE" popup_label="$right_data$" />
+            <label location="@id/label" value="$key_text$" />
+            <label location="@id/label_sup" value="$alternate_data$" />
+        </softkey_template>
+        <softkey_list template_id="@id/softkey_template_tplus_pair" splitter=" ">
+            <softkey id="@id/softkey_tplus_qw" press_data="qw" keycode_press="Q" left_data="q" keycode_left="Q" right_data="w" keycode_right="W" alternate_data="1" key_text="Q W" />
+            <softkey id="@id/softkey_tplus_er" press_data="er" keycode_press="E" left_data="e" keycode_left="E" right_data="r" keycode_right="R" alternate_data="2" key_text="E R" />
+            <softkey id="@id/softkey_tplus_ty" press_data="ty" keycode_press="T" left_data="t" keycode_left="T" right_data="y" keycode_right="Y" alternate_data="3" key_text="T Y" />
+            <softkey id="@id/softkey_tplus_ui" press_data="ui" keycode_press="U" left_data="u" keycode_left="U" right_data="i" keycode_right="I" alternate_data="4" key_text="U I" />
+            <softkey id="@id/softkey_tplus_op" press_data="op" keycode_press="O" left_data="o" keycode_left="O" right_data="p" keycode_right="P" alternate_data="5" key_text="O P" />
+            <softkey id="@id/softkey_tplus_as" press_data="as" keycode_press="A" left_data="a" keycode_left="A" right_data="s" keycode_right="S" alternate_data="6" key_text="A S" />
+            <softkey id="@id/softkey_tplus_df" press_data="df" keycode_press="D" left_data="d" keycode_left="D" right_data="f" keycode_right="F" alternate_data="7" key_text="D F" />
+            <softkey id="@id/softkey_tplus_gh" press_data="gh" keycode_press="G" left_data="g" keycode_left="G" right_data="h" keycode_right="H" alternate_data="8" key_text="G H" />
+            <softkey id="@id/softkey_tplus_jk" press_data="jk" keycode_press="J" left_data="j" keycode_left="J" right_data="k" keycode_right="K" alternate_data="9" key_text="J K" />
+            <softkey id="@id/softkey_tplus_zx" press_data="zx" keycode_press="Z" left_data="z" keycode_left="Z" right_data="x" keycode_right="X" alternate_data="@" key_text="Z X" />
+            <softkey id="@id/softkey_tplus_cv" press_data="cv" keycode_press="C" left_data="c" keycode_left="C" right_data="v" keycode_right="V" alternate_data="!" key_text="C V" />
+            <softkey id="@id/softkey_tplus_bn" press_data="bn" keycode_press="B" left_data="b" keycode_left="B" right_data="n" keycode_right="N" alternate_data="?" key_text="B N" />
+        </softkey_list>
+
+        <softkey_template id="@id/softkey_template_tplus_pair_upper" layout="@layout/softkey_9key" slide_sensitivity="LESS" popup_timing="ON_GESTURE" multi_touch="false" content_description="$key_text$">
+            <action type="PRESS" data="$press_data$" keycode="$keycode_press$" intention="DECODE" />
+            <action type="LONG_PRESS" data="$alternate_data$" keycode="PLAIN_TEXT" intention="COMMIT" popup_label="$alternate_data$" popup_layout="@attr/PopupBubbleRectangularSmallLayout" />
+            <action type="SLIDE_LEFT" data="$left_data$" keycode="$keycode_left$" intention="DECODE" popup_label="$left_data$" />
+            <action type="SLIDE_RIGHT" data="$right_data$" keycode="$keycode_right$" intention="DECODE" popup_label="$right_data$" />
+            <label location="@id/label" value="$key_text$" />
+            <label location="@id/label_sup" value="$alternate_data$" />
+        </softkey_template>
+        <softkey_list template_id="@id/softkey_template_tplus_pair_upper" splitter=" ">
+            <softkey id="@id/softkey_tplus_up_qw" press_data="QW" keycode_press="Q" left_data="Q" keycode_left="Q" right_data="W" keycode_right="W" alternate_data="1" key_text="Q W" />
+            <softkey id="@id/softkey_tplus_up_er" press_data="ER" keycode_press="E" left_data="E" keycode_left="E" right_data="R" keycode_right="R" alternate_data="2" key_text="E R" />
+            <softkey id="@id/softkey_tplus_up_ty" press_data="TY" keycode_press="T" left_data="T" keycode_left="T" right_data="Y" keycode_right="Y" alternate_data="3" key_text="T Y" />
+            <softkey id="@id/softkey_tplus_up_ui" press_data="UI" keycode_press="U" left_data="U" keycode_left="U" right_data="I" keycode_right="I" alternate_data="4" key_text="U I" />
+            <softkey id="@id/softkey_tplus_up_op" press_data="OP" keycode_press="O" left_data="O" keycode_left="O" right_data="P" keycode_right="P" alternate_data="5" key_text="O P" />
+            <softkey id="@id/softkey_tplus_up_as" press_data="AS" keycode_press="A" left_data="A" keycode_left="A" right_data="S" keycode_right="S" alternate_data="6" key_text="A S" />
+            <softkey id="@id/softkey_tplus_up_df" press_data="DF" keycode_press="D" left_data="D" keycode_left="D" right_data="F" keycode_right="F" alternate_data="7" key_text="D F" />
+            <softkey id="@id/softkey_tplus_up_gh" press_data="GH" keycode_press="G" left_data="G" keycode_left="G" right_data="H" keycode_right="H" alternate_data="8" key_text="G H" />
+            <softkey id="@id/softkey_tplus_up_jk" press_data="JK" keycode_press="J" left_data="J" keycode_left="J" right_data="K" keycode_right="K" alternate_data="9" key_text="J K" />
+            <softkey id="@id/softkey_tplus_up_zx" press_data="ZX" keycode_press="Z" left_data="Z" keycode_left="Z" right_data="X" keycode_right="X" alternate_data="@" key_text="Z X" />
+            <softkey id="@id/softkey_tplus_up_cv" press_data="CV" keycode_press="C" left_data="C" keycode_left="C" right_data="V" keycode_right="V" alternate_data="!" key_text="C V" />
+            <softkey id="@id/softkey_tplus_up_bn" press_data="BN" keycode_press="B" left_data="B" keycode_left="B" right_data="N" keycode_right="N" alternate_data="?" key_text="B N" />
+        </softkey_list>
+
+        <softkey id="@id/softkey_tplus_l" layout="@layout/softkey_9key" slide_sensitivity="LESS" popup_timing="ON_GESTURE" multi_touch="false" content_description="L hyphen">
+            <action type="PRESS" data="l" keycode="L" intention="DECODE" />
+            <action type="LONG_PRESS" data="0" keycode="KEYCODE_0" intention="COMMIT" popup_label="0" popup_layout="@attr/PopupBubbleRectangularSmallLayout" />
+            <action type="SLIDE_RIGHT" data="-" keycode="MINUS" intention="COMMIT" popup_label="-" />
+            <label location="@id/label" value="L -" />
+            <label location="@id/label_sup" value="0" />
+        </softkey>
+        <softkey id="@id/softkey_tplus_m" layout="@layout/softkey_9key" slide_sensitivity="LESS" popup_timing="ON_GESTURE" multi_touch="false" content_description="M apostrophe">
+            <action type="PRESS" data="m" keycode="M" intention="DECODE" />
+            <action type="LONG_PRESS" data="," keycode="COMMA" intention="COMMIT" popup_label="," popup_layout="@attr/PopupBubbleRectangularSmallLayout" />
+            <action type="SLIDE_RIGHT" data="'" keycode="APOSTROPHE" intention="DECODE" popup_label="'" />
+            <label location="@id/label" value="M '" />
+            <label location="@id/label_sup" value="," />
+        </softkey>
+        <softkey id="@id/softkey_tplus_up_l" layout="@layout/softkey_9key" slide_sensitivity="LESS" popup_timing="ON_GESTURE" multi_touch="false" content_description="L hyphen">
+            <action type="PRESS" data="L" keycode="L" intention="DECODE" />
+            <action type="LONG_PRESS" data="0" keycode="KEYCODE_0" intention="COMMIT" popup_label="0" popup_layout="@attr/PopupBubbleRectangularSmallLayout" />
+            <action type="SLIDE_RIGHT" data="-" keycode="MINUS" intention="COMMIT" popup_label="-" />
+            <label location="@id/label" value="L -" />
+            <label location="@id/label_sup" value="0" />
+        </softkey>
+        <softkey id="@id/softkey_tplus_up_m" layout="@layout/softkey_9key" slide_sensitivity="LESS" popup_timing="ON_GESTURE" multi_touch="false" content_description="M apostrophe">
+            <action type="PRESS" data="M" keycode="M" intention="DECODE" />
+            <action type="LONG_PRESS" data="," keycode="COMMA" intention="COMMIT" popup_label="," popup_layout="@attr/PopupBubbleRectangularSmallLayout" />
+            <action type="SLIDE_RIGHT" data="'" keycode="APOSTROPHE" intention="DECODE" popup_label="'" />
+            <label location="@id/label" value="M '" />
+            <label location="@id/label_sup" value="," />
+        </softkey>
+    </softkeys>
+</framework>

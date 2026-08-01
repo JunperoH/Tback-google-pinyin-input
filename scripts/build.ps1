@@ -7,7 +7,7 @@ param(
     [Parameter(Mandatory = $true)][string]$KeyAlias,
     [Parameter(Mandatory = $true)][string]$StorePassword,
     [Parameter(Mandatory = $true)][string]$KeyPassword,
-    [string]$ApplicationId = "com.google.android.inputmethod.pinyin.compat"
+    [string]$ApplicationId = "com.google.android.inputmethod.pinyin.compat.tplus"
 )
 
 $ErrorActionPreference = "Stop"

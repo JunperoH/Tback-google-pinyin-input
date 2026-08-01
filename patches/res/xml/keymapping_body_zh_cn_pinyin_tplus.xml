@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<framework>
+    <include href="@xml/keymapping_function_shift" />
+    <key_mapping>
+        <mapping view_id="@id/key_pos_tplus_qw" key_id="@id/softkey_tplus_qw" />
+        <mapping view_id="@id/key_pos_tplus_er" key_id="@id/softkey_tplus_er" />
+        <mapping view_id="@id/key_pos_tplus_ty" key_id="@id/softkey_tplus_ty" />
+        <mapping view_id="@id/key_pos_tplus_ui" key_id="@id/softkey_tplus_ui" />
+        <mapping view_id="@id/key_pos_tplus_op" key_id="@id/softkey_tplus_op" />
+        <mapping view_id="@id/key_pos_tplus_as" key_id="@id/softkey_tplus_as" />
+        <mapping view_id="@id/key_pos_tplus_df" key_id="@id/softkey_tplus_df" />
+        <mapping view_id="@id/key_pos_tplus_gh" key_id="@id/softkey_tplus_gh" />
+        <mapping view_id="@id/key_pos_tplus_jk" key_id="@id/softkey_tplus_jk" />
+        <mapping view_id="@id/key_pos_tplus_l" key_id="@id/softkey_tplus_l" />
+        <mapping view_id="@id/key_pos_tplus_zx" key_id="@id/softkey_tplus_zx" />
+        <mapping view_id="@id/key_pos_tplus_cv" key_id="@id/softkey_tplus_cv" />
+        <mapping view_id="@id/key_pos_tplus_bn" key_id="@id/softkey_tplus_bn" />
+        <mapping view_id="@id/key_pos_tplus_m" key_id="@id/softkey_tplus_m" />
+        <mapping view_id="@id/key_pos_del" key_id="@id/softkey_del" />
+    </key_mapping>
+    <key_mapping state="COMPOSING">
+        <mapping view_id="@id/key_pos_del" key_id="@id/softkey_del_composing" />
+        <mapping view_id="@id/key_pos_shift" key_id="@id/softkey_ci" />
+    </key_mapping>
+    <key_mapping state="SHIFT">
+        <mapping view_id="@id/key_pos_tplus_qw" key_id="@id/softkey_tplus_up_qw" />
+        <mapping view_id="@id/key_pos_tplus_er" key_id="@id/softkey_tplus_up_er" />
+        <mapping view_id="@id/key_pos_tplus_ty" key_id="@id/softkey_tplus_up_ty" />
+        <mapping view_id="@id/key_pos_tplus_ui" key_id="@id/softkey_tplus_up_ui" />
+        <mapping view_id="@id/key_pos_tplus_op" key_id="@id/softkey_tplus_up_op" />
+        <mapping view_id="@id/key_pos_tplus_as" key_id="@id/softkey_tplus_up_as" />
+        <mapping view_id="@id/key_pos_tplus_df" key_id="@id/softkey_tplus_up_df" />
+        <mapping view_id="@id/key_pos_tplus_gh" key_id="@id/softkey_tplus_up_gh" />
+        <mapping view_id="@id/key_pos_tplus_jk" key_id="@id/softkey_tplus_up_jk" />
+        <mapping view_id="@id/key_pos_tplus_l" key_id="@id/softkey_tplus_up_l" />
+        <mapping view_id="@id/key_pos_tplus_zx" key_id="@id/softkey_tplus_up_zx" />
+        <mapping view_id="@id/key_pos_tplus_cv" key_id="@id/softkey_tplus_up_cv" />
+        <mapping view_id="@id/key_pos_tplus_bn" key_id="@id/softkey_tplus_up_bn" />
+        <mapping view_id="@id/key_pos_tplus_m" key_id="@id/softkey_tplus_up_m" />
+    </key_mapping>
+    <key_mapping state="SHIFT_LOCK">
+        <mapping view_id="@id/key_pos_tplus_qw" key_id="@id/softkey_tplus_up_qw" />
+        <mapping view_id="@id/key_pos_tplus_er" key_id="@id/softkey_tplus_up_er" />
+        <mapping view_id="@id/key_pos_tplus_ty" key_id="@id/softkey_tplus_up_ty" />
+        <mapping view_id="@id/key_pos_tplus_ui" key_id="@id/softkey_tplus_up_ui" />
+        <mapping view_id="@id/key_pos_tplus_op" key_id="@id/softkey_tplus_up_op" />
+        <mapping view_id="@id/key_pos_tplus_as" key_id="@id/softkey_tplus_up_as" />
+        <mapping view_id="@id/key_pos_tplus_df" key_id="@id/softkey_tplus_up_df" />
+        <mapping view_id="@id/key_pos_tplus_gh" key_id="@id/softkey_tplus_up_gh" />
+        <mapping view_id="@id/key_pos_tplus_jk" key_id="@id/softkey_tplus_up_jk" />
+        <mapping view_id="@id/key_pos_tplus_l" key_id="@id/softkey_tplus_up_l" />
+        <mapping view_id="@id/key_pos_tplus_zx" key_id="@id/softkey_tplus_up_zx" />
+        <mapping view_id="@id/key_pos_tplus_cv" key_id="@id/softkey_tplus_up_cv" />
+        <mapping view_id="@id/key_pos_tplus_bn" key_id="@id/softkey_tplus_up_bn" />
+        <mapping view_id="@id/key_pos_tplus_m" key_id="@id/softkey_tplus_up_m" />
+    </key_mapping>
+    <key_mapping state="COMPOSING+SHIFT_LOCK">
+        <mapping view_id="@id/key_pos_shift" key_id="@id/softkey_shift_locked" />
+    </key_mapping>
+</framework>

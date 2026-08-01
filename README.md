@@ -1,110 +1,149 @@
-# Google 拼音输入法 创造性 AI 版
+# Google 拼音输入法 T+ 自用版
 
-**English project name: Comeback Google Pinyin Input**
+[![构建状态](https://github.com/JunperoH/Tback-google-pinyin-input/actions/workflows/build-release.yml/badge.svg)](https://github.com/JunperoH/Tback-google-pinyin-input/actions/workflows/build-release.yml)
+![版本](https://img.shields.io/badge/version-1.0.0-0969da)
+![Android](https://img.shields.io/badge/Android-17%2B-3DDC84?logo=android&logoColor=white)
+![架构](https://img.shields.io/badge/ABI-arm64--v8a-555555)
 
-这是基于 Google 拼音输入法 4.5.2 的非商业兼容维护与创造性 AI 协作项目。目标是在尽量保持原始输入体验、候选逻辑、词库格式和主题行为的前提下，让这款已经停止更新的输入法继续用于 Android 16/17，并以可复现、可审计的方式维护兼容补丁。
+基于 [`huaxianyan/comeback-google-pinyin-input`](https://github.com/huaxianyan/comeback-google-pinyin-input) 的个人 fork，在 Google 拼音输入法 4.5.2 兼容版本之上，独立重建触宝风格的 **T+ 全键双字母布局**。
+
+T+ 是新增的可选中文键盘，不会覆盖原有的全键盘、九键、笔画和手写布局。本项目不包含触宝代码、词库、图片、原生库或其他程序资源。
+
+> [!IMPORTANT]
+> 当前 T+ 版本为 `1.0.0`，发布标签使用 `tplus-v1.0.0`。仓库继承的历史标签 `v1.0.0` 属于上游兼容版，不是 T+ 自用版。
+
+## 目录
+
+- [下载](#下载)
+- [T+ 布局与操作](#t-布局与操作)
+- [主要功能](#主要功能)
+- [安装与启用](#安装与启用)
+- [版本与兼容性](#版本与兼容性)
+- [用户词典备份](#用户词典备份)
+- [从源码构建](#从源码构建)
+- [项目文档](#项目文档)
+- [来源与法律声明](#来源与法律声明)
 
 ## 下载
 
-“Google 拼音输入法 创造性 AI 版”正式构建请从项目的 [Releases](https://github.com/huaxianyan/comeback-google-pinyin-input/releases) 页面下载。Android 应用内、输入法选择器、设置页和 Launcher 中的显示名称仍保持为“Google 拼音输入法”。
+请从本 fork 的 [GitHub Releases](https://github.com/JunperoH/Tback-google-pinyin-input/releases) 下载文件名如下的 APK：
 
-仓库同时保存用于复现构建的原始官方 APK：
+```text
+ComebackGooglePinyinInput-TPlus-arm64-v8a-1.0.0.apk
+```
 
-[`original/google-pinyin-input-4.5.2.193126728-arm64-v8a.apk`](original/google-pinyin-input-4.5.2.193126728-arm64-v8a.apk)
+下载后请同时校验 Release 附带的 `.sha256` 文件。若 Releases 页面尚未出现 `tplus-v1.0.0`，表示当前代码仍处于合并或发布准备阶段；不要将历史 `v1.0.0` 误认为 T+ 版本。
 
-## 版本信息
+不需要 T+ 布局时，可从[上游 Releases](https://github.com/huaxianyan/comeback-google-pinyin-input/releases) 获取原兼容版。
 
-### 原始版本
+## T+ 布局与操作
 
-| 项目 | 内容 |
+键位保持 QWERTY 的空间顺序，每个主键容纳两个相邻字母：
+
+```text
+QW  ER  TY  UI  OP
+AS  DF  GH  JK  L-
+    ZX  CV  BN  M'
+```
+
+| 操作 | 行为 |
 | --- | --- |
-| 产品名称 | Google Pinyin Input / Google 拼音输入法 |
-| 原始版本 | `4.5.2.193126728` |
-| 原始包名 | `com.google.android.inputmethod.pinyin` |
-| 架构 | `arm64-v8a` |
-| 原始 target SDK | 26 |
-| 原始 APK SHA-256 | `980fd0f4695f683648e6f7ab9a15a24732e8957b5b14b25d49af931176574bd7` |
-| 签名主体 | `OU=Google, Inc, O=Google, Inc, L=Mountain View, ST=CA, C=US` |
-| 签名证书 SHA-256 | `3D:7A:12:23:01:9A:A3:9D:9E:A0:E3:43:6A:B7:C0:89:6B:FB:4F:B6:79:F4:DE:5F:E7:C2:3F:32:6C:8F:99:4A` |
+| 点击双字母键 | 将两个字母作为等权备选送入 Google 拼音 HMM，由拼音和上下文消歧 |
+| 短距离向左或向右滑动 | 明确选择键上的第一个或第二个字母 |
+| 长按字母键 | 弹出并提交右上角标注的数字或标点 |
+| 跨越多个键连续滑动 | 在启用“滑行输入”后，由 Google 拼音手势 HMM 根据轨迹生成候选 |
 
-Google 拼音输入法最初由 Google 发布并通过 Google Play 等官方 Android 分发渠道提供。本仓库中的原始 APK 用于软件保存、兼容性研究和可复现构建，其文件哈希与签名信息列于上表，便于独立校验来源和完整性。
+实现原理、APK 审计和独立重建边界见 [T+ 移植说明](docs/touchpal-tplus-port.md)。
 
-### 最新正式版本
+## 主要功能
 
-| 项目 | 内容 |
+### T+ 输入
+
+- 与全键盘、九键、笔画和手写并列显示，可随时切换。
+- 覆盖 26 个英文字母，并保留左右滑动单字母输入。
+- 支持数字、常用标点长按气泡和松手提交。
+- 复用 Google 拼音原生候选栏、用户词典、上下文预测与手势解码管线。
+
+### 现代 Android 兼容
+
+- 修复 Android 16 手写首笔崩溃，保留原有压感宽度、路径平滑和识别流程。
+- 修复候选、标点、符号及表情列表滚动后的误点击和分页手势问题。
+- 增加剪贴板候选，并保持原生主题、关闭按钮和完整文本提交行为。
+- 交由 Android 的 LTPO/ARR 机制调度刷新率，不再持续请求固定 120 Hz。
+- 补全现代 Android 所需的关键 `android:exported` 声明。
+
+### 本地数据与隐私
+
+- 加固用户词典落盘、滚动备份、中断恢复和并发保存。
+- 支持内部存储、SD 卡及兼容 DocumentsProvider 的云端目录备份。
+- 支持可配置备份周期、保留版本、立即备份和手动导入。
+- 移除失效的 Clearcut/Primes、Firebase、反馈上传、在线词典更新及旧 Google 账户词典同步链路。
+- 云端文件操作仅通过用户主动授权的 Android Storage Access Framework 完成。
+
+完整兼容改动见 [兼容性说明](docs/compatibility-notes.md) 和 [变更日志](CHANGELOG.md)。
+
+## 安装与启用
+
+1. 下载并安装 `arm64-v8a` APK。
+2. 打开应用，按照系统提示启用“Google 拼音输入法”。
+3. 将其设为当前输入法。
+4. 在键盘布局选择页面选择“拼音 T+ 双字母键盘”。
+5. 如需连续滑动，在输入法设置中启用“滑行输入”。
+
+T+ 自用版使用独立包名和独立签名证书，可与 Google 原版及上游兼容版同时安装。覆盖升级必须继续使用相同证书；它不能覆盖由 Google 或上游证书签名的应用。
+
+## 版本与兼容性
+
+| 项目 | 当前值 |
 | --- | --- |
-| 项目中文名称 | Google 拼音输入法 创造性 AI 版 |
-| English project name | Comeback Google Pinyin Input |
-| 项目版本 | `1.0.3` |
-| Android versionName | `1.0.3` |
-| Android versionCode | `4520384` |
-| 正式包名 | `com.google.android.inputmethod.pinyin.compat` |
-| 架构 | `arm64-v8a` |
-| 正式 APK | `ComebackGooglePinyinInput-arm64-v8a-1.0.3.apk` |
-| target SDK | 28 |
-| 主要测试设备 | Pixel 10 Pro / Android 16 |
+| T+ 版本 | `1.0.0` |
+| Android `versionCode` | `4520403` |
+| 应用包名 | `com.google.android.inputmethod.pinyin.compat.tplus` |
+| 最低 Android API | 17 |
+| 目标 Android API | 28 |
+| CPU 架构 | `arm64-v8a` |
+| 原始基础版本 | Google 拼音输入法 `4.5.2.193126728` |
+| 签名证书 SHA-256 | `0FA3AD8C58A98FD550D37D787FEACC573F2E8A7AC71207667BDFBF0D9124D250` |
 
-上表对应正式 Release `v1.0.3`：备份和导入位置继续支持内部存储、SD 卡及 Google Drive 等 DocumentsProvider，同时移除失效的 Google 账户词典同步请求，并保留本地“清除用户字典”功能。后续 `master` 仍可能包含尚未发布的研究或兼容修复；是否发布以 GitHub Release 和 `CHANGELOG.md` 为准。
+### 已验证
 
-创造性 AI 版使用独立包名和项目签名证书，可以与 Google 原始版本同时安装。以后升级时必须继续使用同一签名证书；它不能覆盖由 Google 官方证书签名的原始应用。
+- apktool 2.12.1 完整解码、补丁、重建和签名 APK 反向解码校验通过。
+- ZIP 对齐以及 APK v1、v2、v3 签名校验通过。
+- Android 14 / API 34 / 4 KB 页大小模拟器覆盖安装通过。
+- 从测试版覆盖升级到 `1.0.0` 后，T+ 布局选择和输入法数据得到保留。
+- 数字与标点长按、跨键滑动候选、候选选择和文本提交闭环通过。
 
-## 主要兼容改进
+### 已知限制
 
-- 修复 Android 16 手写首笔因旧 `Canvas.clipRect(..., Region.Op.REPLACE)` 导致的崩溃。
-- 保持原有 `ALPHA_8` 离屏手写画布、压感宽度、路径平滑和原生识别流程。
-- 修复候选、标点、符号和表情列表滚动后外层键盘错误触发点击的问题。
-- 修复全键盘符号/表情分页中失效的滑动距离门槛，同时保留原有翻页、吸附和动画参数。
-- 增加与原生候选管线融合的剪贴板候选、主题化剪贴板图标和原生关闭控制，点击后提交完整剪贴板文本。
-- 根据实际键盘主题表面调整 Android 导航栏颜色和明暗图标。
-- 移除持续固定 120 Hz 的旧兼容请求，由 Android 的 LTPO/ARR 调度刷新率。
-- 将首次使用引导整理为“启用 → 选择输入法 → 完成”，使用明确的上一步/下一步导航。
-- 加固用户词典持久化：滚动 `_bak`、中断 `_tmp` 恢复、失败主文件隔离、进程级保存锁和显式清理保护。
-- 增加用户词典自动备份，可选择内部存储、SD 卡或支持读写的云端文档目录；备份与手动导入共用该位置。
-- 支持 1/3/7/14/30 天备份间隔、3/5/10/20/30 个保留版本、立即备份和手动导入。
-- 在进入词典设置页后按需显示中英文词条数、主文件、滚动副本、恢复旁路和最近落盘时间；应用及键盘启动时不扫描。
-- 备份使用 Google 拼音原生 UTF-16LE 用户词典导出/导入格式；应用自身不实现云同步或自动恢复，云端 I/O 由用户选择的 DocumentsProvider 管理。
-- 清理失效的 Clearcut/Primes、Firebase、反馈上传、在线词典更新及旧 Google 账户词典同步组件；Google Drive 备份只使用系统 SAF 目录授权。
-- 补全现代 Android 要求的关键 `android:exported` 声明。
+- 当前仅提供 `arm64-v8a` 构建。
+- Google 拼音 4.5.2 的旧原生库按 4 KB 页对齐，无法在强制 16 KB 页大小的 Android 系统镜像中加载。
+- T+ 双字母在手势模型中共享同一几何区域，首选排序不一定达到触宝原生引擎的水平。例如测试轨迹可能先给出 `bu hao`，再给出 `ni hao`。
+- API 34 模拟器上的旧首启 Activity 存在布局兼容问题；核心输入法可在预先完成启用/布局选择后正常运行。用户已报告真机基本输入可用，但仍建议保留可回滚版本。
+- 本项目不移植触宝的云服务、社交学习、专有纠错模型或原生库。
 
-更完整的实现记录、Gboard 对照研究和测试结论位于 [`docs/`](docs/) 与 [`CHANGELOG.md`](CHANGELOG.md)。
+触宝与 Google 拼音的纠错、联想和 T+ 排序对比见 [纠错与联想分析](docs/touchpal-vs-google-correction.md)。
 
-## 用户词典灾难恢复
+## 用户词典备份
 
-在“设置 → 字典”中选择“备份和导入位置”后，自动备份、立即备份、版本轮换和内置手动导入都会使用同一个用户授权目录。目录可位于内部存储、SD 卡或 Google Drive 等支持创建、读写、重命名和删除文档的云端位置。设备存储中的公共文件不会因清除应用数据或卸载创造性 AI 版而被删除；云端文件的同步、离线能力和保留规则由对应存储服务管理。
+在“设置 → 字典”中选择“备份和导入位置”后，自动备份、立即备份、版本轮换和内置导入将共用该目录。目录可以位于内部存储、SD 卡，或支持创建、读写、重命名和删除的云端 DocumentsProvider。
 
 恢复步骤：
 
-1. 安装创造性 AI 版并启用输入法。
+1. 安装并启用输入法。
 2. 打开“设置 → 字典”。
-3. 点击“导入用户词典备份”；新安装尚无目录授权时，重新选择原来的备份目录。
-4. 从内置列表选择所需备份并确认导入。
+3. 重新选择原备份目录。
+4. 点击“导入用户词典备份”，选择所需版本并确认。
 
-导入采用原生合并/更新语义，不会自动覆盖或回滚当前词典。也可以在文件管理器中打开或分享备份 `.txt` 到 Google 拼音。
+导入沿用 Google 拼音原生合并/更新语义，不会自动覆盖或回滚当前词典。详细设计见 [用户词典自动备份](docs/dictionary-auto-backup-design.md) 和 [词典健康状态](docs/dictionary-health-status-design.md)。
 
-## 仓库结构
+## 从源码构建
 
-```text
-original/
-  google-pinyin-input-4.5.2.193126728-arm64-v8a.apk  原始官方安装包
-patches/
-  java/                                               兼容辅助代码源码
-  smali/                                              构建时注入的 smali
-  res/                                                兼容资源
-scripts/
-  apply_patches.py                                    可复现补丁流程
-  build.ps1                                           Windows 构建脚本
-docs/                                                 调查、设计与测试记录
-CHANGELOG.md                                          版本变更记录
-```
+### 环境要求
 
-## 构建
-
-所需工具：
-
-- Java 11+
+- Java 11 或更高版本
 - Python 3
 - apktool 2.12.1
-- uber-apk-signer 1.3.0，或 Android SDK 的 `apksigner`/`zipalign`
+- uber-apk-signer 1.3.0，或 Android SDK 的 `apksigner`、`zipalign`
 - PKCS#12/JKS 签名证书
 
 PowerShell 示例：
@@ -115,86 +154,45 @@ PowerShell 示例：
   -ApktoolJar ./tools/apktool.jar `
   -SignerJar ./tools/uber-apk-signer.jar `
   -Keystore ./signing.p12 `
-  -KeyAlias google-pinyin-local `
-  -StorePassword 'your-password' `
-  -KeyPassword 'your-password'
+  -KeyAlias your-key-alias `
+  -StorePassword 'your-store-password' `
+  -KeyPassword 'your-key-password'
 ```
 
-补丁脚本会从原始 APK 解码、应用资源及 smali 改动、修改为独立包名，然后重建、对齐并签名。
-
-## GitHub Actions 自动构建与发布
-
-工作流位于 [`.github/workflows/build-release.yml`](.github/workflows/build-release.yml)：
-
-- 推送到 `master`：构建、签名、校验 APK，并保存 30 天的 Actions artifact；
-- 推送 `v*` 标签：执行相同构建，然后创建正式 GitHub Release 并上传 APK 与 `.sha256`；
-- `workflow_dispatch`：可从 Actions 页面手动构建，不自动发布 Release。
-
-### 签名一致性
-
-Android 是否允许覆盖升级取决于**签名证书身份**，而不是 APK 文件名。自动构建必须使用与现有正式创造性 AI 版完全相同的 PKCS#12/JKS 私钥。私钥和密码不能写进仓库或普通 Actions Variables，应存入 GitHub Actions **Secrets**：
-
-| GitHub Secret | 内容 |
-| --- | --- |
-| `ANDROID_SIGNING_KEYSTORE_BASE64` | 正式 `.p12` 文件的完整 Base64 |
-| `ANDROID_SIGNING_STORE_PASSWORD` | keystore 密码 |
-| `ANDROID_SIGNING_KEY_PASSWORD` | 私钥密码 |
-
-以下非敏感配置写入 GitHub Actions **Variables**：
-
-| GitHub Variable | 正式值 |
-| --- | --- |
-| `ANDROID_SIGNING_KEY_ALIAS` | `google-pinyin-test` |
-| `ANDROID_SIGNING_CERT_SHA256` | `985CBF843A362169B129AEAC5E153D13095F0923231936D1486A20C8332CDE2F` |
-| `ANDROID_APPLICATION_ID` | `com.google.android.inputmethod.pinyin.compat` |
-
-工作流在构建前使用 `keytool` 读取恢复出的证书指纹，并与 `ANDROID_SIGNING_CERT_SHA256` 比较。证书不一致、密码错误、alias 错误或任何配置缺失都会立即终止，因此不会误发一个无法覆盖升级的 APK。原始 APK、apktool 和签名工具也分别执行固定 SHA-256 校验。
-
-### 使用 GitHub CLI 配置仓库
-
-先登录并进入仓库目录：
+静态验证：
 
 ```powershell
-gh auth login
+python scripts/verify_tplus.py work/decoded
 ```
 
-将 keystore 转为 Base64 后直接送入 Secret；Base64 不会写入仓库文件：
+签名、GitHub Actions 和正式发布流程见 [构建与发布指南](docs/build-and-release.md)。
 
-```powershell
-[Convert]::ToBase64String(
-  [IO.File]::ReadAllBytes("work/test-signing.p12")
-) | gh secret set ANDROID_SIGNING_KEYSTORE_BASE64
+## 仓库结构
+
+```text
+original/     用于可复现构建的原始官方 APK
+patches/      资源、Java 辅助代码和 smali 补丁
+scripts/      补丁、构建与 T+ 静态验证脚本
+docs/         设计、研究、兼容与测试记录
 ```
 
-密码使用交互式输入，避免出现在终端历史中：
+## 项目文档
 
-```powershell
-gh secret set ANDROID_SIGNING_STORE_PASSWORD
-gh secret set ANDROID_SIGNING_KEY_PASSWORD
-```
+- [T+ 布局移植说明](docs/touchpal-tplus-port.md)
+- [触宝与 Google 拼音纠错/联想对比](docs/touchpal-vs-google-correction.md)
+- [兼容性说明](docs/compatibility-notes.md)
+- [用户词典自动备份设计](docs/dictionary-auto-backup-design.md)
+- [用户词典健康状态设计](docs/dictionary-health-status-design.md)
+- [构建与发布指南](docs/build-and-release.md)
+- [变更日志](CHANGELOG.md)
 
-设置非敏感变量：
+## 来源与法律声明
 
-```powershell
-gh variable set ANDROID_SIGNING_KEY_ALIAS --body "google-pinyin-test"
-gh variable set ANDROID_SIGNING_CERT_SHA256 --body "985CBF843A362169B129AEAC5E153D13095F0923231936D1486A20C8332CDE2F"
-gh variable set ANDROID_APPLICATION_ID --body "com.google.android.inputmethod.pinyin.compat"
-```
+- Google Pinyin Input、Google 拼音输入法、Google 名称、标志、原始程序、资源、词库及相关商标的权利归 Google LLC、Google Inc. 或其各自权利人所有。
+- 本项目维护者不代表、不隶属于且未获得 Google 或 TouchPal/CooTek 的官方背书。
+- 原始 APK 仅用于软件保存、兼容性研究和可复现构建；其 SHA-256 为 `980fd0f4695f683648e6f7ab9a15a24732e8957b5b14b25d49af931176574bd7`。
+- 本项目中的 T+ 实现是对公开交互方式的独立重建，不复制触宝代码、图片、词库、原生库或打包资源。
+- 本项目以个人、非商业的软件保存和互操作性研究为目的提供，不收费、不接入广告，也不以相关品牌或原始程序牟利。
+- 使用者应自行确认并遵守所在地法律、原软件许可及相关权利要求。
 
-配置后可在 GitHub 的 **Actions → Build and release APK → Run workflow** 手动验证一次。确认 artifact 能安装并覆盖正式创造性 AI 版后，以新版本提交创建标签：
-
-```powershell
-git tag -a v1.0.3 -m "ComebackGooglePinyinInput 1.0.3"
-git push origin v1.0.3
-```
-
-标签推送后无需在本地构建或上传 APK。`GITHUB_TOKEN` 由 Actions 自动提供，只授予工作流创建 Release 所需的 `contents: write` 权限。
-
-## 来源、版权与非商业声明
-
-- **Google Pinyin Input、Google 拼音输入法、Google 名称、标志、原始程序、资源、词库和相关商标的版权及其他权利归 Google LLC、Google Inc. 或其各自权利人所有。**
-- 本项目维护者不拥有 Google 原始软件及商标，也不代表、不隶属于且未获得 Google 官方背书。
-- 本项目中的兼容补丁、研究记录和构建脚本由项目贡献者以个人、非商业的软件保存、互操作性研究和旧设备兼容维护为目的提供。
-- 原始 APK 保持其原有版权状态；兼容构建不会改变原始作品的权利归属。使用者应遵守所在地法律、原软件条款及相关权利要求。
-- 本项目不收费，不出售应用，不接入广告，也不以 Google 品牌或原始程序牟利。
-- 如相关权利人认为仓库内容需要调整，可通过 GitHub Issues 或仓库所有者联系方式提出说明。
+如发现构建、兼容或权利归属问题，请通过 [GitHub Issues](https://github.com/JunperoH/Tback-google-pinyin-input/issues) 提交说明。
