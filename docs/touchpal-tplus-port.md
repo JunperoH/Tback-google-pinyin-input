@@ -46,6 +46,7 @@ The existing candidate UI, composition lifecycle, mixed Chinese/English option, 
 - Long-press: commit the small digit or symbol printed on the key.
 - Slide right on `L -` or `M '`: input the punctuation shown beside the letter.
 - Shift: use the uppercase pair definitions; behavior follows the existing mixed English input preference.
+- With gesture input enabled, a longer cross-key path is handled by Google Pinyin's existing gesture UI and native HMM decoder. Each T+ key contributes both letters at the same geometry; short left/right key slides remain available below the original gesture threshold.
 
 T+ is registered as `zh_cn_pinyin_tplus` in `framework_chinese_soft.xml`, so the existing keyboard dashboard can select it alongside QWERTY, 9-key, stroke and handwriting.
 
@@ -56,6 +57,11 @@ T+ is registered as `zh_cn_pinyin_tplus` in `framework_chinese_soft.xml`, so the
 - Full resource and smali rebuild with aapt2/apktool: passed.
 - Static checks for all 26 letter positions, pair actions, visual order, IME registration and both T+/T9 decoder branches: passed.
 - Final APK alignment, package/version/ABI identity, v1/v2/v3 signature verification and reverse-decode inspection: passed.
-- Device test: pending; no ADB device was attached during the initial implementation.
+- Initial tap-based T+ input: reported working on device.
+- Android 14 (API 34, 4 KB page size) emulator install, IME activation and T+ selection: passed. The dashboard kept QWERTY, 9-key and the other original layouts alongside T+.
+- Long-press popup and commit: passed for both a digit (`QW / 1`) and punctuation (`ZX / @`), using the stock 9-key popup as the control case.
+- Cross-key gesture input: passed with a continuous `BN -> UI -> GH -> AS -> OP` path. The native decoder produced `bu hao` with both `不好` and `你好` candidates; selecting `你好` committed it to the target field without a crash.
 
-The first device test should cover dashboard selection, `nihao`, `zhongguo`, ambiguous pairs such as `ui/ty`, backspace while composing, candidate selection, shift/mixed English, symbol long-press, orientation changes and switching back to QWERTY/9-key.
+A real-device acceptance pass should still cover `nihao`, `zhongguo`, ambiguous pairs such as `ui/ty`, backspace while composing, shift/mixed English, every remaining digit/symbol long-press, short single-key slides, longer cross-key gesture paths, orientation changes and repeated switching between T+, QWERTY and 9-key. Gesture first-candidate quality is not expected to match a layout-native TouchPal model without further ranking work.
+
+The gesture implementation is an extension built from Google Pinyin's bundled `PinyinGestureHandler`, `PinyinKeyboardLayoutHandler` and `hmm_gesture` runtime. It does not copy TouchPal Curve code or models. Public TouchPal manuals differ by version and commonly document Curve as a T26-only mode, so T+ gesture quality must be evaluated independently on device.

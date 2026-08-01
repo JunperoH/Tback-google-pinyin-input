@@ -3,7 +3,7 @@
     <softkeys>
         <softkey_template id="@id/softkey_template_tplus_pair" layout="@layout/softkey_9key" slide_sensitivity="LESS" popup_timing="ON_GESTURE" multi_touch="false" content_description="$key_text$">
             <action type="PRESS" data="$press_data$" keycode="$keycode_press$" intention="DECODE" />
-            <action type="LONG_PRESS" data="$alternate_data$" intention="COMMIT" popup_label="$alternate_data$" popup_layout="@attr/PopupBubbleRectangularSmallLayout" />
+            <action type="LONG_PRESS" data="$alternate_data$" keycode="PLAIN_TEXT" intention="COMMIT" popup_label="$alternate_data$" popup_layout="@attr/PopupBubbleRectangularSmallLayout" />
             <action type="SLIDE_LEFT" data="$left_data$" keycode="$keycode_left$" intention="DECODE" popup_label="$left_data$" />
             <action type="SLIDE_RIGHT" data="$right_data$" keycode="$keycode_right$" intention="DECODE" popup_label="$right_data$" />
             <label location="@id/label" value="$key_text$" />
@@ -26,7 +26,7 @@
 
         <softkey_template id="@id/softkey_template_tplus_pair_upper" layout="@layout/softkey_9key" slide_sensitivity="LESS" popup_timing="ON_GESTURE" multi_touch="false" content_description="$key_text$">
             <action type="PRESS" data="$press_data$" keycode="$keycode_press$" intention="DECODE" />
-            <action type="LONG_PRESS" data="$alternate_data$" intention="COMMIT" popup_label="$alternate_data$" popup_layout="@attr/PopupBubbleRectangularSmallLayout" />
+            <action type="LONG_PRESS" data="$alternate_data$" keycode="PLAIN_TEXT" intention="COMMIT" popup_label="$alternate_data$" popup_layout="@attr/PopupBubbleRectangularSmallLayout" />
             <action type="SLIDE_LEFT" data="$left_data$" keycode="$keycode_left$" intention="DECODE" popup_label="$left_data$" />
             <action type="SLIDE_RIGHT" data="$right_data$" keycode="$keycode_right$" intention="DECODE" popup_label="$right_data$" />
             <label location="@id/label" value="$key_text$" />
@@ -49,28 +49,28 @@
 
         <softkey id="@id/softkey_tplus_l" layout="@layout/softkey_9key" slide_sensitivity="LESS" popup_timing="ON_GESTURE" multi_touch="false" content_description="L hyphen">
             <action type="PRESS" data="l" keycode="L" intention="DECODE" />
-            <action type="LONG_PRESS" data="0" intention="COMMIT" popup_label="0" popup_layout="@attr/PopupBubbleRectangularSmallLayout" />
+            <action type="LONG_PRESS" data="0" keycode="KEYCODE_0" intention="COMMIT" popup_label="0" popup_layout="@attr/PopupBubbleRectangularSmallLayout" />
             <action type="SLIDE_RIGHT" data="-" keycode="MINUS" intention="COMMIT" popup_label="-" />
             <label location="@id/label" value="L -" />
             <label location="@id/label_sup" value="0" />
         </softkey>
         <softkey id="@id/softkey_tplus_m" layout="@layout/softkey_9key" slide_sensitivity="LESS" popup_timing="ON_GESTURE" multi_touch="false" content_description="M apostrophe">
             <action type="PRESS" data="m" keycode="M" intention="DECODE" />
-            <action type="LONG_PRESS" data="," intention="COMMIT" popup_label="," popup_layout="@attr/PopupBubbleRectangularSmallLayout" />
+            <action type="LONG_PRESS" data="," keycode="COMMA" intention="COMMIT" popup_label="," popup_layout="@attr/PopupBubbleRectangularSmallLayout" />
             <action type="SLIDE_RIGHT" data="'" keycode="APOSTROPHE" intention="DECODE" popup_label="'" />
             <label location="@id/label" value="M '" />
             <label location="@id/label_sup" value="," />
         </softkey>
         <softkey id="@id/softkey_tplus_up_l" layout="@layout/softkey_9key" slide_sensitivity="LESS" popup_timing="ON_GESTURE" multi_touch="false" content_description="L hyphen">
             <action type="PRESS" data="L" keycode="L" intention="DECODE" />
-            <action type="LONG_PRESS" data="0" intention="COMMIT" popup_label="0" popup_layout="@attr/PopupBubbleRectangularSmallLayout" />
+            <action type="LONG_PRESS" data="0" keycode="KEYCODE_0" intention="COMMIT" popup_label="0" popup_layout="@attr/PopupBubbleRectangularSmallLayout" />
             <action type="SLIDE_RIGHT" data="-" keycode="MINUS" intention="COMMIT" popup_label="-" />
             <label location="@id/label" value="L -" />
             <label location="@id/label_sup" value="0" />
         </softkey>
         <softkey id="@id/softkey_tplus_up_m" layout="@layout/softkey_9key" slide_sensitivity="LESS" popup_timing="ON_GESTURE" multi_touch="false" content_description="M apostrophe">
             <action type="PRESS" data="M" keycode="M" intention="DECODE" />
-            <action type="LONG_PRESS" data="," intention="COMMIT" popup_label="," popup_layout="@attr/PopupBubbleRectangularSmallLayout" />
+            <action type="LONG_PRESS" data="," keycode="COMMA" intention="COMMIT" popup_label="," popup_layout="@attr/PopupBubbleRectangularSmallLayout" />
             <action type="SLIDE_RIGHT" data="'" keycode="APOSTROPHE" intention="DECODE" popup_label="'" />
             <label location="@id/label" value="M '" />
             <label location="@id/label_sup" value="," />

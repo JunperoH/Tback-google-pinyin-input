@@ -59,6 +59,13 @@ def verify_softkeys() -> None:
             require(key.get("keycode_left") == pair[0].upper(), f"Wrong left keycode for {pair}")
             require(key.get("keycode_right") == pair[1].upper(), f"Wrong right keycode for {pair}")
 
+    templates = root.findall("./softkeys/softkey_template")
+    for template in templates:
+        long_press = template.find("action[@type='LONG_PRESS']")
+        require(long_press is not None, "T+ pair template lacks long press")
+        require(long_press.get("keycode") == "PLAIN_TEXT", "T+ pair popup lacks a text keycode")
+        require(long_press.get("popup_layout") is not None, "T+ pair popup layout is missing")
+
     single_keys = {
         key.get("id"): key
         for key in root.findall("./softkeys/softkey")
@@ -72,8 +79,10 @@ def verify_softkeys() -> None:
         key = single_keys.get(f"@id/softkey_tplus_{suffix}")
         require(key is not None, f"Missing single-letter key {suffix}")
         press = key.find("action[@type='PRESS']")
+        long_press = key.find("action[@type='LONG_PRESS']")
         slide = key.find("action[@type='SLIDE_RIGHT']")
         require(press is not None and press.get("data") == letter, f"Wrong press for {suffix}")
+        require(long_press is not None and long_press.get("keycode") is not None, f"Missing popup keycode for {suffix}")
         require(slide is not None and slide.get("data") == punctuation, f"Wrong slide for {suffix}")
 
     covered = "".join(EXPECTED_PAIRS) + "lm"
@@ -112,6 +121,20 @@ def verify_layout_and_mapping() -> None:
         "@id/softkey_tplus_m",
     }, "NORMAL T+ key mapping is incomplete")
 
+    keyboard = parse(RES / "xml" / "keyboard_zh_cn_pinyin_tplus.xml")
+    handlers = {
+        handler.get("class")
+        for handler in keyboard.findall("./keyboard/view[@type='body']/motion_event_handler")
+    }
+    require(
+        "com.google.android.apps.inputmethod.pinyin.keyboard.PinyinGestureHandler" in handlers,
+        "T+ gesture motion handler is missing",
+    )
+    require(
+        "com.google.android.apps.inputmethod.pinyin.keyboard.PinyinKeyboardLayoutHandler" in handlers,
+        "T+ gesture layout handler is missing",
+    )
+
 
 def verify_decoded(decoded: Path) -> None:
     framework = (decoded / "res" / "xml" / "framework_chinese_soft.xml").read_text(encoding="utf-8")
@@ -127,6 +150,17 @@ def verify_decoded(decoded: Path) -> None:
 
     helper = decoded / "smali/com/google/android/apps/inputmethod/libs/hmm/TPlusKeyMapping.smali"
     require(helper.is_file(), "Decoded TPlusKeyMapping helper is missing")
+    gesture_extractor = (decoded / "smali/bdy.smali").read_text(encoding="utf-8")
+    for instruction in (
+        "Ljava/lang/String;->length()I",
+        "Ljava/lang/String;->codePointAt(I)I",
+        "add-int/lit8 v1, v1, 0x1",
+        "Ljava/util/List;->add(Ljava/lang/Object;)Z",
+    ):
+        require(
+            gesture_extractor.count(instruction) == 1,
+            f"T+ multi-letter gesture instruction is missing or duplicated: {instruction}",
+        )
     for relative in (
         "res/xml/ime_zh_cn_pinyin_tplus.xml",
         "res/xml/keyboard_zh_cn_pinyin_tplus.xml",
