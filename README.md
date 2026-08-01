@@ -49,16 +49,16 @@ Google 拼音输入法最初由 Google 发布并通过 Google Play 等官方 And
 | --- | --- |
 | 项目中文名称 | Google 拼音输入法 T+ 自用版 |
 | English project name | Comeback Google Pinyin Input |
-| 项目版本 | `1.1.0-tplus.2` |
-| Android versionName | `1.1.0-tplus.2` |
-| Android versionCode | `4520402` |
+| 项目版本 | `1.0.0` |
+| Android versionName | `1.0.0` |
+| Android versionCode | `4520403`（保持递增，可覆盖安装测试版） |
 | 包名 | `com.google.android.inputmethod.pinyin.compat.tplus` |
 | 架构 | `arm64-v8a` |
-| APK | `ComebackGooglePinyinInput-TPlus-arm64-v8a-1.1.0-tplus.2.apk` |
+| APK | `ComebackGooglePinyinInput-TPlus-arm64-v8a-1.0.0.apk` |
 | target SDK | 28 |
 | 验证状态 | apktool 2.12.1 完整重建通过；Android 14（API 34、4 KB 页）模拟器安装与输入闭环通过；待真机手感验收 |
 
-`1.1.0-tplus.2` 继承上游 `v1.0.3` 的兼容、词典备份和失效服务清理，增加 T+ 布局、长按气泡与连续滑行输入。是否发布以本 fork 的 GitHub Release 和 `CHANGELOG.md` 为准。
+`1.0.0` 是本 fork 重新整理版本线后的首个正式版本，继承上游 `v1.0.3` 的兼容、词典备份和失效服务清理，并包含 T+ 布局、长按气泡与连续滑行输入。此前的 `1.1.0-tplus.1/.2` 仅视为发布前测试版本。是否发布以本 fork 的 GitHub Release 和 `CHANGELOG.md` 为准。
 
 T+ 自用版使用独立包名和独立签名证书，可以与 Google 原版及上游兼容版同时安装。以后升级时必须继续使用同一签名证书；它不能覆盖由 Google 或上游证书签名的应用。
 
@@ -148,7 +148,7 @@ python scripts/verify_tplus.py work/decoded
 工作流位于 [`.github/workflows/build-release.yml`](.github/workflows/build-release.yml)：
 
 - 推送到 `master`：构建、签名、校验 APK，并保存 30 天的 Actions artifact；
-- 推送 `v*` 标签：执行相同构建，然后创建正式 GitHub Release 并上传 APK 与 `.sha256`；
+- 推送 `tplus-v*` 标签：执行相同构建，然后创建正式 GitHub Release 并上传 APK 与 `.sha256`；T+ 专用前缀用于避开上游已存在的历史标签；
 - `workflow_dispatch`：可从 Actions 页面手动构建，不自动发布 Release。
 
 ### 签名一致性
@@ -205,8 +205,8 @@ gh variable set ANDROID_APPLICATION_ID --body "com.google.android.inputmethod.pi
 配置后可在 GitHub 的 **Actions → Build and release APK → Run workflow** 手动验证一次。确认 artifact 能安装并覆盖上一版 T+ 自用版后，以新版本提交创建标签：
 
 ```powershell
-git tag -a v1.1.0-tplus.2 -m "Comeback Google Pinyin Input T+ 1.1.0-tplus.2"
-git push origin v1.1.0-tplus.2
+git tag -a tplus-v1.0.0 -m "Comeback Google Pinyin Input T+ 1.0.0"
+git push origin tplus-v1.0.0
 ```
 
 标签推送后无需在本地构建或上传 APK。`GITHUB_TOKEN` 由 Actions 自动提供，只授予工作流创建 Release 所需的 `contents: write` 权限。
