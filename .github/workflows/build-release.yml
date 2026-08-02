@@ -31,9 +31,9 @@ env:
   SIGNER_SHA256: "e1299fd6fcf4da527dd53735b56127e8ea922a321128123b9c32d619bba1d835"
   ORIGINAL_APK: original/google-pinyin-input-4.5.2.193126728-arm64-v8a.apk
   ORIGINAL_APK_SHA256: "980fd0f4695f683648e6f7ab9a15a24732e8957b5b14b25d49af931176574bd7"
-  RELEASE_APK_NAME: ComebackGooglePinyinInput-TPlus-arm64-v8a-1.0.0.apk
-  EXPECTED_VERSION_NAME: "1.0.0"
-  EXPECTED_VERSION_CODE: "4520403"
+  RELEASE_APK_NAME: ComebackGooglePinyinInput-TPlus-arm64-v8a-1.1.0.apk
+  EXPECTED_VERSION_NAME: "1.1.0"
+  EXPECTED_VERSION_CODE: "4520406"
 
 jobs:
   build:
@@ -140,7 +140,31 @@ jobs:
 
       - name: Verify T+ layout integration
         shell: pwsh
-        run: python scripts/verify_tplus.py work/decoded
+        run: |
+          python scripts/verify_tplus.py work/decoded
+          python scripts/generate_stroke_filter_data.py --check
+          python scripts/verify_stroke_filter.py work/decoded
+
+      - name: Verify reproducibility and final APK contents
+        shell: pwsh
+        run: |
+          java -jar work/tools/apktool.jar d -f `
+            -p work/apktool-framework `
+            -o work/decoded-repro `
+            $env:ORIGINAL_APK
+          python scripts/apply_patches.py work/decoded-repro --application-id $env:APPLICATION_ID
+          python scripts/verify_reproducible_patch.py work/decoded work/decoded-repro
+
+          $signed = @(Get-ChildItem dist -Filter "*-aligned-signed.apk")
+          if ($signed.Count -ne 1) {
+            throw "Expected exactly one signed APK, found $($signed.Count)"
+          }
+          java -jar work/tools/apktool.jar d -f `
+            -p work/apktool-framework `
+            -o work/redecoded `
+            $signed[0].FullName
+          python scripts/verify_tplus.py work/redecoded
+          python scripts/verify_stroke_filter.py work/redecoded
 
       - name: Verify package and version identity
         shell: pwsh
@@ -200,9 +224,9 @@ jobs:
           APK_SHA256: ${{ steps.artifact.outputs.sha256 }}
         run: |
           $notes = @"
-          # Google 拼音输入法 T+ 自用版 1.0.0
+          # Google 拼音输入法 T+ 自用版 1.1.0
 
-          本版本是 T+ 自用版重新整理版本线后的首个正式版本，包含可选 T+ 双字母布局、数字/标点长按气泡及 Google 拼音原生手势 HMM 跨键滑行输入。
+          当前布局为 T+ 且“拼音笔画过滤”已开启时，本版本会关闭 Google 拼音滑行输入；候选出现后自动旁观轨迹，越过系统阈值后识别笔画并显示主题化痕迹。
 
           - English project name: ``Comeback Google Pinyin Input``
           - Architecture: ``arm64-v8a``
@@ -221,16 +245,16 @@ jobs:
           gh release view $env:TAG_NAME --repo $env:GITHUB_REPOSITORY *> $null
           if ($LASTEXITCODE -eq 0) {
             gh release upload $env:TAG_NAME `
-              "$env:APK_PATH#ComebackGooglePinyinInput-TPlus-arm64-v8a-1.0.0.apk" `
-              "$env:APK_PATH.sha256#ComebackGooglePinyinInput-TPlus-arm64-v8a-1.0.0.apk.sha256" `
+              "$env:APK_PATH" `
+              "$env:APK_PATH.sha256" `
               --repo $env:GITHUB_REPOSITORY --clobber
           } else {
             gh release create $env:TAG_NAME `
-              "$env:APK_PATH#ComebackGooglePinyinInput-TPlus-arm64-v8a-1.0.0.apk" `
-              "$env:APK_PATH.sha256#ComebackGooglePinyinInput-TPlus-arm64-v8a-1.0.0.apk.sha256" `
+              "$env:APK_PATH" `
+              "$env:APK_PATH.sha256" `
               --repo $env:GITHUB_REPOSITORY `
               --verify-tag `
-              --title "v1.0.0 - T+ 自用版首个正式版本" `
+              --title "v1.1.0 - T+ 笔画过滤" `
               --notes-file release-notes.md
           }
 

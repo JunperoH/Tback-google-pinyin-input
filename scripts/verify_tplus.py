@@ -20,6 +20,7 @@ PAIR_ROWS = (
 )
 EXPECTED_PAIRS = tuple(pair for row in PAIR_ROWS for pair in row)
 EXPECTED_NORMAL_IDS = tuple(f"@id/softkey_tplus_{pair}" for pair in EXPECTED_PAIRS)
+PAIR_ALTERNATES = tuple("123456789@!?")
 
 
 def require(condition: bool, message: str) -> None:
@@ -49,7 +50,9 @@ def verify_softkeys() -> None:
     for index, expected_upper in enumerate((False, True)):
         keys = lists[index].findall("softkey")
         require(len(keys) == len(EXPECTED_PAIRS), "Unexpected T+ pair count")
-        for key, expected_pair in zip(keys, EXPECTED_PAIRS, strict=True):
+        for key, expected_pair, alternate in zip(
+            keys, EXPECTED_PAIRS, PAIR_ALTERNATES, strict=True
+        ):
             pair = expected_pair.upper() if expected_upper else expected_pair
             prefix = "@id/softkey_tplus_up_" if expected_upper else "@id/softkey_tplus_"
             require(key.get("id") == prefix + expected_pair, f"Wrong key id for {pair}")
@@ -58,23 +61,34 @@ def verify_softkeys() -> None:
             require(key.get("right_data") == pair[1], f"Wrong right slide for {pair}")
             require(key.get("keycode_left") == pair[0].upper(), f"Wrong left keycode for {pair}")
             require(key.get("keycode_right") == pair[1].upper(), f"Wrong right keycode for {pair}")
+            expected_popup = f"{alternate} {expected_pair[0]} {expected_pair[1]} " \
+                f"{expected_pair[0].upper()} {expected_pair[1].upper()}"
+            if alternate == "?":
+                expected_popup = "\\" + expected_popup
+            require(key.get("alternate_data") == alternate, f"Wrong corner label for {pair}")
+            require(key.get("long_press_data") == expected_popup, f"Wrong long-press menu for {pair}")
 
     templates = root.findall("./softkeys/softkey_template")
     for template in templates:
         long_press = template.find("action[@type='LONG_PRESS']")
         require(long_press is not None, "T+ pair template lacks long press")
+        require(long_press.get("data") == "$long_press_data$", "T+ pair popup does not use its menu data")
         require(long_press.get("keycode") == "PLAIN_TEXT", "T+ pair popup lacks a text keycode")
-        require(long_press.get("popup_layout") is not None, "T+ pair popup layout is missing")
+        require(long_press.get("intention") == "COMMIT", "T+ pair popup must commit text")
+        require(
+            long_press.get("popup_layout") == "@attr/PopupBubbleRectangularLayout",
+            "T+ pair popup must use the multi-candidate rectangular layout",
+        )
 
     single_keys = {
         key.get("id"): key
         for key in root.findall("./softkeys/softkey")
     }
-    for suffix, letter, punctuation in (
-        ("l", "l", "-"),
-        ("m", "m", "'"),
-        ("up_l", "L", "-"),
-        ("up_m", "M", "'"),
+    for suffix, letter, punctuation, popup in (
+        ("l", "l", "-", "0 l L"),
+        ("m", "m", "'", ", m M"),
+        ("up_l", "L", "-", "0 l L"),
+        ("up_m", "M", "'", ", m M"),
     ):
         key = single_keys.get(f"@id/softkey_tplus_{suffix}")
         require(key is not None, f"Missing single-letter key {suffix}")
@@ -82,7 +96,15 @@ def verify_softkeys() -> None:
         long_press = key.find("action[@type='LONG_PRESS']")
         slide = key.find("action[@type='SLIDE_RIGHT']")
         require(press is not None and press.get("data") == letter, f"Wrong press for {suffix}")
-        require(long_press is not None and long_press.get("keycode") is not None, f"Missing popup keycode for {suffix}")
+        require(long_press is not None, f"Missing popup for {suffix}")
+        require(long_press.get("data") == popup, f"Wrong long-press menu for {suffix}")
+        require(long_press.get("popup_label") == popup, f"Wrong popup label for {suffix}")
+        require(long_press.get("keycode") == "PLAIN_TEXT", f"Wrong popup keycode for {suffix}")
+        require(long_press.get("intention") == "COMMIT", f"Wrong popup intention for {suffix}")
+        require(
+            long_press.get("popup_layout") == "@attr/PopupBubbleRectangularLayout",
+            f"Wrong popup layout for {suffix}",
+        )
         require(slide is not None and slide.get("data") == punctuation, f"Wrong slide for {suffix}")
 
     covered = "".join(EXPECTED_PAIRS) + "lm"
@@ -122,10 +144,18 @@ def verify_layout_and_mapping() -> None:
     }, "NORMAL T+ key mapping is incomplete")
 
     keyboard = parse(RES / "xml" / "keyboard_zh_cn_pinyin_tplus.xml")
-    handlers = {
-        handler.get("class")
-        for handler in keyboard.findall("./keyboard/view[@type='body']/motion_event_handler")
-    }
+    handler_nodes = keyboard.findall("./keyboard/view[@type='body']/motion_event_handler")
+    handlers = {handler.get("class") for handler in handler_nodes}
+    require(
+        handler_nodes[0].get("class")
+        == "com.google.android.apps.inputmethod.libs.hmm.StrokeFilterMotionEventHandler",
+        "Stroke capture handler must be registered before BasicMotionEventHandler",
+    )
+    require(
+        handler_nodes[0].get("preference_key")
+        == "@string/tplus_stroke_filter_preference_key",
+        "Stroke capture handler must use the stable default-off preference",
+    )
     require(
         "com.google.android.apps.inputmethod.pinyin.keyboard.PinyinGestureHandler" in handlers,
         "T+ gesture motion handler is missing",

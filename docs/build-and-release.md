@@ -6,13 +6,15 @@
 
 | 项目 | 当前值 |
 | --- | --- |
-| Android `versionName` | `1.0.0` |
-| Android `versionCode` | `4520403` |
+| Android `versionName` | `1.1.0` |
+| Android `versionCode` | `4520406` |
 | 应用包名 | `com.google.android.inputmethod.pinyin.compat.tplus` |
-| Release 标签 | `tplus-v1.0.0` |
-| APK 文件名 | `ComebackGooglePinyinInput-TPlus-arm64-v8a-1.0.0.apk` |
+| Release 标签 | `tplus-v1.1.0` |
+| APK 文件名 | `ComebackGooglePinyinInput-TPlus-arm64-v8a-1.1.0.apk` |
 
 `versionCode` 必须始终递增，即使重新整理了对外版本号，也不能降低该值，否则 Android 会拒绝覆盖安装。T+ Release 使用 `tplus-v*` 标签，避免与继承自上游的历史 `v1.0.0` 冲突。
+
+GitHub Release 的 Assets 必须直接使用上述完整文件名及其 `.sha256` 文件名；`gh release create/upload` 不得使用 `文件路径#显示别名` 语法。
 
 ## 本地构建
 
@@ -48,9 +50,12 @@
 
 ```powershell
 python scripts/verify_tplus.py work/decoded
+python scripts/generate_stroke_filter_data.py --check
+python scripts/verify_stroke_filter.py work/decoded
+python scripts/verify_reproducible_patch.py work/decoded work/decoded-repro
 ```
 
-验证内容包括 26 字母覆盖、键位顺序、左右滑动、长按动作、IME 注册、T+/T9 解码分支以及双字母手势几何注入。
+验证内容包括 26 字母覆盖、键位顺序、左右滑动、长按动作、IME 注册、T+/T9 解码分支、笔画过滤会话及手势捕获。CI 还会从同一原始 APK 生成第二份补丁树逐文件比较，并反解最终签名 APK 再运行完整检查。
 
 ## 签名管理
 
@@ -142,8 +147,8 @@ gh variable set ANDROID_APPLICATION_ID --body "com.google.android.inputmethod.pi
 6. 创建并推送 T+ 专用标签：
 
 ```powershell
-git tag -a tplus-v1.0.0 -m "Comeback Google Pinyin Input T+ 1.0.0"
-git push origin tplus-v1.0.0
+git tag -a tplus-v1.1.0 -m "Comeback Google Pinyin Input T+ 1.1.0"
+git push origin tplus-v1.1.0
 ```
 
 标签推送后，GitHub Actions 会创建 Release 并上传 APK 与 `.sha256`。无需在本地手动上传签名产物。
@@ -151,6 +156,7 @@ git push origin tplus-v1.0.0
 ## 发布前检查清单
 
 - [ ] T+ 静态验证通过。
+- [ ] Conway 数据与笔画过滤静态验证通过。
 - [ ] apktool 完整重建通过。
 - [ ] 最终签名 APK 可反向解码。
 - [ ] ZIP 对齐通过。
