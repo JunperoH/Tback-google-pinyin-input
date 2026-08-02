@@ -1,0 +1,7 @@
+# The Conway source is content-addressed by an exact SHA-256. Keep its
+# repository bytes stable on Windows runners where core.autocrlf may be true.
+third_party/conway-stroke-data/codepoint-character-sequence.txt text eol=lf
+third_party/conway-stroke-data/LICENSE-CC-BY-4.0.txt text eol=lf
+
+# Generated stroke data is a binary Android resource.
+patches/res/raw/stroke_filter_data.bin binary
