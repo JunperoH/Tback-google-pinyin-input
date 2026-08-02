@@ -1,7 +1,7 @@
 # Google 拼音输入法 T+ 自用版
 
 [![构建状态](https://github.com/JunperoH/Tback-google-pinyin-input/actions/workflows/build-release.yml/badge.svg)](https://github.com/JunperoH/Tback-google-pinyin-input/actions/workflows/build-release.yml)
-![版本](https://img.shields.io/badge/version-1.0.0-0969da)
+![版本](https://img.shields.io/badge/version-1.1.0-0969da)
 ![Android](https://img.shields.io/badge/Android-17%2B-3DDC84?logo=android&logoColor=white)
 ![架构](https://img.shields.io/badge/ABI-arm64--v8a-555555)
 
@@ -10,7 +10,7 @@
 T+ 是新增的可选中文键盘，不会覆盖原有的全键盘、九键、笔画和手写布局。本项目不包含触宝代码、词库、图片、原生库或其他程序资源。
 
 > [!IMPORTANT]
-> 当前 T+ 版本为 `1.0.0`，发布标签使用 `tplus-v1.0.0`。仓库继承的历史标签 `v1.0.0` 属于上游兼容版，不是 T+ 自用版。
+> 当前 T+ 版本为 `1.1.0`，发布标签使用 `tplus-v1.1.0`。仓库继承的历史标签 `v1.0.0` 属于上游兼容版，不是 T+ 自用版。
 
 ## 目录
 
@@ -29,10 +29,10 @@ T+ 是新增的可选中文键盘，不会覆盖原有的全键盘、九键、�
 请从本 fork 的 [GitHub Releases](https://github.com/JunperoH/Tback-google-pinyin-input/releases) 下载文件名如下的 APK：
 
 ```text
-ComebackGooglePinyinInput-TPlus-arm64-v8a-1.0.0.apk
+ComebackGooglePinyinInput-TPlus-arm64-v8a-1.1.0.apk
 ```
 
-下载后请同时校验 Release 附带的 `.sha256` 文件。若 Releases 页面尚未出现 `tplus-v1.0.0`，表示当前代码仍处于合并或发布准备阶段；不要将历史 `v1.0.0` 误认为 T+ 版本。
+下载后请同时校验 Release 附带的 `.sha256` 文件。Assets 直接使用完整文件名，不设置额外显示别名；不要将历史 `v1.0.0` 误认为 T+ 版本。
 
 不需要 T+ 布局时，可从[上游 Releases](https://github.com/huaxianyan/comeback-google-pinyin-input/releases) 获取原兼容版。
 
@@ -50,8 +50,9 @@ AS  DF  GH  JK  L-
 | --- | --- |
 | 点击双字母键 | 将两个字母作为等权备选送入 Google 拼音 HMM，由拼音和上下文消歧 |
 | 短距离向左或向右滑动 | 明确选择键上的第一个或第二个字母 |
-| 长按字母键 | 弹出并提交右上角标注的数字或标点 |
-| 跨越多个键连续滑动 | 在启用“滑行输入”后，由 Google 拼音手势 HMM 根据轨迹生成候选 |
+| 长按字母键 | 弹出数字/标点及对应小写、大写字母的有序多候选菜单 |
+| 跨越多个键连续滑动 | 仅当“拼音笔画过滤”关闭时使用 Google 拼音滑行输入；在 T+ 中开启笔画过滤会关闭滑行输入 |
+| 候选出现后在键盘主体书写 | 开启“拼音笔画过滤”后自动识别越过触摸阈值的横、竖、撇、点/捺、折；普通点按和静止长按仍走原 Basic handler，“笔”用于暂停/恢复 |
 
 实现原理、APK 审计和独立重建边界见 [T+ 移植说明](docs/touchpal-tplus-port.md)。
 
@@ -63,6 +64,8 @@ AS  DF  GH  JK  L-
 - 覆盖 26 个英文字母，并保留左右滑动单字母输入。
 - 支持数字、常用标点长按气泡和松手提交。
 - 复用 Google 拼音原生候选栏、用户词典、上下文预测与手势解码管线。
+- 可在设置中开启默认关闭的“拼音笔画过滤”；当前布局为 T+ 且已有候选时自动旁观轨迹，越过系统触摸阈值后识别笔画并显示主题化痕迹。普通点按和静止长按保留；较长左右短滑会优先成为横笔。
+- Conway 笔顺数据固定到可复现版本；加载失败、缓存保护或世代失效时 fail-open，恢复原拼音候选顺序。
 
 ### 现代 Android 兼容
 
@@ -88,7 +91,8 @@ AS  DF  GH  JK  L-
 2. 打开应用，按照系统提示启用“Google 拼音输入法”。
 3. 将其设为当前输入法。
 4. 在键盘布局选择页面选择“拼音 T+ 双字母键盘”。
-5. 如需连续滑动，在输入法设置中启用“滑行输入”。
+5. 如需连续滑动，在输入法设置中启用“滑行输入”，并保持“拼音笔画过滤”关闭。
+6. 如需拼音笔画过滤，在“设置 → 输入 → 中文输入”开启“拼音笔画过滤”；T+ 滑行输入会随即关闭。输入拼音出现候选后，直接在键盘主体书写。
 
 T+ 自用版使用独立包名和独立签名证书，可与 Google 原版及上游兼容版同时安装。覆盖升级必须继续使用相同证书；它不能覆盖由 Google 或上游证书签名的应用。
 
@@ -96,8 +100,8 @@ T+ 自用版使用独立包名和独立签名证书，可与 Google 原版及上
 
 | 项目 | 当前值 |
 | --- | --- |
-| T+ 版本 | `1.0.0` |
-| Android `versionCode` | `4520403` |
+| T+ 版本 | `1.1.0` |
+| Android `versionCode` | `4520406` |
 | 应用包名 | `com.google.android.inputmethod.pinyin.compat.tplus` |
 | 最低 Android API | 17 |
 | 目标 Android API | 28 |
@@ -110,8 +114,9 @@ T+ 自用版使用独立包名和独立签名证书，可与 Google 原版及上
 - apktool 2.12.1 完整解码、补丁、重建和签名 APK 反向解码校验通过。
 - ZIP 对齐以及 APK v1、v2、v3 签名校验通过。
 - Android 14 / API 34 / 4 KB 页大小模拟器覆盖安装通过。
-- 从测试版覆盖升级到 `1.0.0` 后，T+ 布局选择和输入法数据得到保留。
-- 数字与标点长按、跨键滑动候选、候选选择和文本提交闭环通过。
+- `1.1.0 / code 4520406` 在 4KB/API34 模拟器确认：自动状态下普通点按与静止长按保留；不点“笔”横划时轨迹即时可见、抬手后候选按横笔过滤，且无 ART/Verify 错误。
+- `si + 笔画前缀 3` 的原生候选迭代器可扫描到“偲”；候选点击与空格复用原 payload 提交路径。
+- T+ 数字/标点与大小写长按菜单、候选筛选数据、会话世代保护和整包 apktool 重建通过自动验证。
 
 ### 已知限制
 

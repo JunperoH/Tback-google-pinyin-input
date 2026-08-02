@@ -2,7 +2,7 @@
 
 | 文档属性 | 值 |
 | --- | --- |
-| 状态 | 方案研究完成，关键集成待验证 |
+| 状态 | `1.1.0` 迭代试做；自动捕获与可见轨迹待模拟器/真机回验 |
 | 目标版本 | `1.1.0` |
 | 最后更新 | 2026-08-02 |
 | 适用范围 | T+ 双字母布局；后续可评估复用到拼音全键盘和九键 |
@@ -22,9 +22,9 @@ hao + 丶 →  优先显示“灏”等首笔为点/捺的候选
 
 推荐方案由四部分组成：
 
-1. 在 T+ 键盘手势处理器链中增加笔画轨迹处理器；仅在“拼音正在组词 + 功能已开启 + 已进入笔画捕获状态”时从主体 `DOWN` 起认领触摸。
+1. 在 T+ 键盘手势处理器链中增加笔画轨迹处理器；“拼音正在组词 + 功能已开启”时自动旁观触摸，只有位移越过系统 touch slop 后才认领。
 2. 将轨迹分类为横、竖、撇、点/捺、折五类，保存当前笔画前缀。
-3. 在 `AbstractHmmIme.requestCandidates(int)` 拉取原生候选时按笔画前缀过滤，继续向后迭代直到填满当前页或候选耗尽。
+3. 在实包实际继承的 `AbstractHmmDecodeProcessor.onRequestCandidates(int)` 拉取原生候选时按笔画前缀过滤，继续向后迭代直到填满当前页或候选耗尽。
 4. 将“长按 T+ 字母键显示原数字/符号 + 键内字母的大小写单字候选”作为独立 XML 小迭代，先于笔画功能交付和回归。
 
 不采用以下方案：
@@ -39,7 +39,7 @@ hao + 丶 →  优先显示“灏”等首笔为点/捺的候选
 | 问题 | 结论 |
 | --- | --- |
 | Okinawa 能否反编译 | Java 和 Lua 可读性较高，ARM native 可反汇编并生成伪代码；但不能恢复原始源码和模型生成过程，也不作为移植路线 |
-| 左右短滑/滑行会否冲突 | 自动捕获时会，而且单靠阈值不能消除；第一版推荐点击候选栏“笔”后才把轨迹交给笔画处理器 |
+| 左右短滑/滑行会否冲突 | 自动捕获时会，而且单靠阈值不能消除；本轮 `1.1.0` 试做按 TouchPal 可观察行为优先识别越阈值轨迹，较长左右短滑会成为横笔 |
 | Conway 怎样接入 | 构建时把固定版本数据生成紧凑 asset，运行时只过滤 Google 拼音 Candidate；不替换 Google 原生笔画布局和 HMM |
 | 两套笔画键盘是否相同 | 前五类及顺序相同，通配、分隔/词语、标点、数字入口和 TouchPal 下滑部件键均不同 |
 | 长按大小写候选怎样做 | 复用 Google 已有多候选 popup XML；14 个 T+ 组合键均保留原数字/符号第一项，再列键内字母的小写和大写 |
@@ -56,16 +56,16 @@ hao + 丶 →  优先显示“灏”等首笔为点/捺的候选
 
 ### 2.1 开关与启用条件
 
-新增设置项“拼音笔画过滤”，默认关闭。第一阶段只对 T+ 生效。为避免把正常的第二个、第三个拼音短滑误当作笔画，推荐增加候选栏“笔”按钮；满足以下条件才接管轨迹：
+新增设置项“拼音笔画过滤”，默认关闭，只对 T+ 生效。设置开启后，首次 T+ 点按先建立 composing；候选出现后自动进入笔画旁观状态，不再要求先点击候选栏“笔”：
 
 ```text
 功能已开启
 AND 当前布局为 T+
 AND 当前存在未提交的拼音 composing
-AND 用户已点击“笔”进入笔画捕获状态
+AND 笔画数据加载成功
 ```
 
-“笔”按钮采用持续模式：进入后可连续写一至五笔，再次点击退出；提交、取消、清空 composing 或切换布局时自动退出。显式进入“笔”状态后，键盘主体的下一次 `DOWN` 就由笔画处理器认领，后续点击、长按、键内短滑和跨键滑行均不再交给 T+；过短轨迹只被消费、不产生笔画，也不能回退成 `PRESS`。用户需要再次点击候选栏“笔”退出，才能恢复原 T+ 操作。没有 composing 或没有进入笔画状态时，T+ 当前的点击双字母、左右短滑选单字母、长按菜单和跨键滑行输入必须保持不变。
+自动旁观时不会在 `DOWN` 上立即独占：小于 touch slop 的点按和静止长按继续由原 Basic handler 处理；轨迹越阈值后笔画 handler 中途调用 `declareTargetHandler()`，其余 handler 被 reset，本段触摸分类为笔画。候选栏“笔”保留为当前 composing 的暂停/恢复入口和状态提示。提交、取消、清空 composing 或切换布局时清理状态。只要当前布局是 T+ 且设置开启，两条 Google 拼音跨键滑行处理链关闭；设置关闭时恢复。由于 T+ 键内短滑与横笔在几何上不可分，较长左右短滑在自动模式下会优先成为横笔，这是试做包的明确取舍。
 
 ### 2.2 过滤状态
 
@@ -108,13 +108,13 @@ Google 框架的实际阈值进一步说明，单靠距离不能给出可靠的�
 
 | 状态 | 点击/长按 | 左右短滑 | 长跨键轨迹 |
 | --- | --- | --- | --- |
-| 无 composing | 原 T+ 行为 | 原 T+ 行为 | 原 Google 滑行输入 |
-| 有 composing，未进入“笔”状态 | 原 T+ 行为 | 原 T+ 精确单字母 | 不由过滤器拦截，交给原 Google gesture handler |
-| 有 composing，已进入“笔”状态 | 全部由笔画处理器消费；小于 slop 不产出 | 五类笔画 | 五类笔画 |
+| 设置关闭 | 原 T+ 行为 | 原 T+ 行为 | 原 Google 滑行输入 |
+| 设置开启，未进入“笔”状态 | 原 T+ 行为 | 原 T+ 精确单字母 | 两条 Pinyin gesture handler 让行，不启动滑行输入 |
+| 设置开启且已进入“笔”状态 | 全部由笔画处理器消费；小于 slop 不产出 | 五类笔画 | 五类笔画 |
 
 如果必须完全复刻触宝的“拼音后直接写”交互，可额外提供实验性“自动捕获”模式，但应明确告知：composing 期间明显左右短滑和滑行轨迹优先作为笔画，不能承诺继续精确输入单字母。此模式不应成为默认值。
 
-长按菜单与笔画捕获的边界因此是确定的：未进入“笔”状态时，笔画 handler 绝不认领，Basic handler 可按原有约 300ms 语义弹出菜单；进入“笔”状态后，键盘主体触摸从 `DOWN` 起全部归笔画 handler，长按菜单有意不可用，必须先点击候选栏“笔”退出。只有将来另做实验性“自动捕获”时，才需要研究延迟认领与长按计时的竞争，该模式不能进入第一版默认路径。
+自动试做把长按边界改为延迟认领：静止触摸没有越过 touch slop，Basic handler 仍可按原有约 300ms 语义弹出菜单；一旦移动越阈值，stroke handler 抢占并 reset Basic。这样能保留长按，但不能同时保留较长键内短滑。
 
 ## 3. 触宝 APK 逆向证据
 
@@ -203,6 +203,8 @@ getWordFilter()
 
 满足条件时事件继续传给下层键盘；否则轨迹提交给 `fireHandwriteOperation`。这里的 `20 px` 只能作为还原行为的证据，不能直接作为现代高密度设备参数。新实现应使用 `ViewConfiguration.getScaledTouchSlop()`、键宽比例和真机采样共同确定阈值。
 
+`HandWriteMaskView` 同时把每个触摸点交给 `MoveContrailView` 绘制，因此原版轨迹在判定完成前就可见。`1500 ms` 是抬手后判为短触摸的上限，不是“等待 1500 ms 才进入笔画”的启动延迟。本项目不复制该实现；试做版独立实现主题色 `StrokeFilterTrailView`，使用圆角路径和平滑淡出，并通过原有 popup 管理器覆盖键盘区域。该视图只绘制，不接收触摸，也不调用 Google 滑行解码器。
+
 ### 3.5 Okinawa 能否反编译
 
 结论是：**能逆向分析到调用、数据流和相当一部分伪代码，但不能还原为原始、可维护、可直接移植的源码。** “可以反编译”需要按层次区分：
@@ -272,17 +274,17 @@ ScrubMoveMotionEventHandler
 
 框架 `IMotionEventHandlerDelegate` 提供 `declareTargetHandler()` 和 `fireEvent()`。`atu.smali` 会在尚无目标处理器时依次把同一个事件交给多个 handler；某个 handler 认领后，其余 handler 被 reset，后续事件只发送给目标 handler。
 
-因此可在 `BasicMotionEventHandler` 之前插入新的 `StrokeFilterMotionEventHandler`。第一版的显式模式使用确定性归属：
+模拟器实测补充：首次 T+ 按键建立 composing 时，`BasicMotionEventHandler` 会在 UP 阶段成为 target；该 target 可能继续占用下一段触摸，使仅依赖 XML 注册顺序的笔画 handler 收不到新的 DOWN。自动试做版只在“新一段 `ACTION_DOWN` + 自动捕获有效”时于 `atu.preHandleTouchEvent()` 和 `atu.handleTouchEvent()` 入口释放旧 target。随后 stroke handler 与 Basic 同时旁观：点按/静止长按仍由 Basic 处理，stroke 仅在位移越过 touch slop 后抢占。两条拼音手势链仍按 `tplusActive && settingEnabled` 门控关闭跨键滑行。由于 XML 生命周期的首次 `activate()` 可能晚于第一段触摸，排在列表首位且仅注册于 T+ 的 stroke handler 会在每个事件进入共享 Pinyin handlers 前刷新 `tplusActive`；非 T+ 布局没有该 handler，不受影响。
 
-1. 未进入“笔”状态时，handler 立即返回且永不认领；
-2. composing 有效且已进入“笔”状态时，在键盘主体 `DOWN` 上立即调用 `declareTargetHandler()`；
-3. 原 Basic/gesture handler 被 reset，当前整段轨迹只归笔画处理器；
-4. `MOVE` 采样并绘制轨迹，`UP` 时分类笔画并通过自定义 Event 发给输入法；
-5. 若总轨迹小于 touch slop，则只消费、不分类，也不回退为 T+ `PRESS`。
+因此可在 `BasicMotionEventHandler` 之前插入新的 `StrokeFilterMotionEventHandler`。本轮自动试做使用延迟归属：
 
-这避免了同一次触摸先被 Basic/gesture 解释、越阈值后又改判笔画的竞态。需要在模拟器验证 `DOWN` 立即认领是否按预期 reset 后续 handler；若框架不允许这一顺序，再在分发处增加严格受“当前布局为 T+ + composing 有效 + 已进入笔状态”约束的预处理，而不是覆盖整个键盘的普通 Android View。
+1. composing 建立且功能开启后自动进入旁观状态；
+2. `DOWN` 只开始采样和绘制，不立即认领，Basic 继续收到同一事件；
+3. 最大位移越过系统 touch slop 时才调用 `declareTargetHandler()`，Basic/其他 handler 此时被 reset；
+4. `UP` 时分类笔画并通过自定义 Event 发给输入法，轨迹随后淡出；
+5. 未越阈值的点按或静止长按不产生笔画，由 Basic 按原流程完成。
 
-实验性“自动捕获”是另一套仲裁：它必须在 `DOWN` 后旁观，到 `MOVE` 越阈值才认领，因而仍会与短滑、滑行和长按计时竞争。不要让实验分支改变第一版显式模式的事件语义。
+这套仲裁保留点按和静止长按，但会抢在 32dp 键内短滑阈值之前认领明显移动；因此自动模式不能承诺保留左右短滑。该行为必须在模拟器与真机分别验收，试验反馈决定后续继续自动模式，还是退回显式按钮/按住后书写。
 
 ### 4.3 候选对象必须原样保留
 
@@ -298,7 +300,7 @@ IHmmEngineWrapper.selectCandidate(Candidate)
 
 ### 4.4 必须扫描深层候选
 
-`AbstractHmmIme.requestCandidates(int)` 从 `mTextCandidateIterator` 取 Candidate，直到满足请求数量，并把 iterator 的 `hasNext()` 传给候选 UI。
+`AbstractHmmDecodeProcessor.onRequestCandidates(int)` 从 `mTextCandidateIterator` 取 Candidate，直到满足请求数量，并把 iterator 的 `hasNext()` 传给候选 UI。
 
 推荐把过滤放在这个循环内。下面的 `session.firstMatchedCandidateForFilter` 指当前过滤请求从 Google 原始顺序中遇到的第一个匹配 Candidate，不是重新构造的文字候选，也不是当前页首项：
 
@@ -364,7 +366,7 @@ unselectCandidate()
 - 点击任意匹配项仍使用该对象自己的 HMM payload；
 - 删除最后一笔后，原始首选和高亮状态能恢复。
 
-若 `highlightCandidate()` 会改变 composing，或默认提交路径无法与过滤列表同步，阶段 B 不得以“看起来第一项高亮”判定完成；需要在 `AbstractHmmIme` 的首选字段/空格事件链上另设受过滤状态保护的挂点。
+若 `highlightCandidate()` 会改变 composing，或默认提交路径无法与过滤列表同步，阶段 B 不得以“看起来第一项高亮”判定完成；需要在 `AbstractHmmDecodeProcessor` 的首选字段/空格事件链上另设受过滤状态保护的挂点。
 
 ### 4.6 Google 内置笔画键盘与触宝笔画键盘的细节差异
 
@@ -525,7 +527,7 @@ Google 独立笔画布局
     → zh-t-i0-stroke 原生引擎产生和提交 Candidate
 ```
 
-因此接入时不动 `processors_zh_cn_stroke.xml`、`HmmStrokeDecodeProcessor`、`softkeys_input_stroke.xml` 或 Google 的 native 数据包。Conway asset 只由 `StrokeFilterCompat` 在 T+ 过滤状态下读取；功能关闭或切换到独立笔画布局时完全不参与。即使过滤挂点位于共享的 `AbstractHmmIme`，也必须同时满足“当前布局是 T+、功能开启、`composingGeneration` 有效、笔画前缀非空”才进入过滤分支，其他拼音布局和独立笔画布局直接走原路径。
+因此接入时不动 `processors_zh_cn_stroke.xml`、`HmmStrokeDecodeProcessor`、`softkeys_input_stroke.xml` 或 Google 的 native 数据包。Conway asset 只由 `StrokeFilterCompat` 在 T+ 过滤状态下读取；功能关闭或切换到独立笔画布局时完全不参与。即使过滤挂点位于共享的 `AbstractHmmDecodeProcessor`，也必须同时满足“当前布局是 T+、功能开启、`composingGeneration` 有效、笔画前缀非空”才进入过滤分支，其他拼音布局和独立笔画布局直接走原路径。
 
 如果未来要用 Conway 自建一套完整笔画输入法，那是另一项产品和排序工程：需要字符/词组候选生成、频率排序、分页、学习和提交链，不应与当前“过滤 Google 拼音候选”的轻量旁路混在一起。
 
@@ -535,10 +537,11 @@ Google 独立笔画布局
 
 | 组件 | 职责 |
 | --- | --- |
-| `StrokeFilterMotionEventHandler` | 未激活时绝不认领；显式“笔”状态下从键盘主体 `DOWN` 起独占、绘制/清理轨迹并分类五种笔画 |
+| `StrokeFilterMotionEventHandler` | composing 后自动旁观；越过 touch slop 才独占，并分类五种笔画 |
+| `StrokeFilterTrailView` | 使用当前主题的手势轨迹颜色绘制圆角平滑路径，抬手后淡出；不接收触摸 |
 | `StrokeFilterCompat` | 保存开关、捕获状态、composing 和笔画前缀；查询数据；匹配 Candidate；处理退格与清理 |
 | `StrokeFilterCandidateSession` | 按 composing 世代缓存并重放原 Candidate；用独立 filter 世代管理前缀请求、全局首个匹配项、分批续扫与过期 UI |
-| 候选栏“笔”入口 | composing 有效时进入/退出持续笔画捕获；显示激活态和当前前缀 |
+| 候选栏“笔”入口 | composing 有效时暂停/恢复自动捕获；显示激活态和当前前缀 |
 | `StrokeFilterData` 或二进制 asset | code point 到五类笔顺前缀的紧凑映射 |
 | 数据生成脚本 | 从固定版本的 Conway 数据生成 asset，并校验目标样例 |
 | 静态验证脚本 | 检查资源注册、handler 顺序、smali 挂点、数据样例和补丁幂等性 |
@@ -551,12 +554,12 @@ Google 独立笔画布局
 
 1. `patches/res/xml/keyboard_zh_cn_pinyin_tplus.xml`
    - 在 Basic handler 前注册 `StrokeFilterMotionEventHandler`；
-   - handler 内同时检查 preference、composing 与显式“笔”状态，未激活时绝不认领。
+   - handler 内同时检查 preference、composing 与自动捕获状态；`DOWN` 只旁观，越过 touch slop 才认领。
 2. `HmmPinyinT9DecodeProcessor`
    - 接收自定义笔画 Event；
    - composing 存在时追加笔画并请求候选刷新；
    - 过滤前缀存在时优先消费退格。
-3. `AbstractHmmIme.requestCandidates(int)`
+3. `AbstractHmmDecodeProcessor.onRequestCandidates(int)`
    - 在 iterator 循环中跳过不匹配 Candidate；
    - 通过 `StrokeFilterCandidateSession` 缓存原 Candidate，前缀变化时从缓存开头重放；
    - 继续拉取直到填满、达到本批扫描上限或 iterator 耗尽；未完成时携带 composing/filter 双 token 安排下一批；
@@ -685,7 +688,7 @@ T+ 只需把当前单值 `alternate_data` 拆成“主替代字符 + 两个单�
 - 加入过滤状态文案、候选栏“笔”入口和设置项；
 - 自动捕获如要保留，只作为非默认实验模式。
 
-完成条件：实际书写五种笔画均能稳定分类，普通点击、长按数字和无 composing 的滑行输入无回归。
+完成条件：实际书写五种笔画均能稳定分类，普通点击和长按数字无回归；设置关闭时滑行输入恢复，设置开启时 T+ 滑行输入不启动。
 
 ### 阶段 D：发布验证
 
@@ -698,7 +701,7 @@ T+ 只需把当前单值 `alternate_data` 拆成“主替代字符 + 两个单�
 
 | 风险 | 影响 | 缓解措施 |
 | --- | --- | --- |
-| 笔画与 T+ 左右短滑冲突 | composing 时误把后续精确字母当笔画 | 第一版必须显式点击“笔”后才接管；自动捕获只做非默认实验模式 |
+| 笔画与 T+ 左右短滑冲突 | composing 时误把后续精确字母当笔画 | `1.1.0` 自动试做明确优先笔画；“笔”可暂停自动捕获，反馈不佳则退回显式或按住后书写 |
 | 与 Google 滑行 handler 竞争 | 轨迹被错误送入拼音滑行模型 | 未进入“笔”状态时笔画 handler 不认领；进入后放在 Basic/gesture 前并在主体 `DOWN` 立即认领，过短轨迹也只消费不回退 |
 | 激活“笔”后误触字母长按 | 用户期待 popup 却只得到笔画轨迹 | 激活态明确禁用键盘主体 PRESS/短滑/滑行/长按；候选栏持续显示退出入口，退出后原菜单恢复 |
 | 候选栏“笔”入口遮挡候选或展开键 | 候选少一项、按钮重叠或扩展页不可用 | 先做静态 UI 原型；与剪贴板 overlay 互斥；必要时使用 T+ 专用 header/candidate-inner layout |
@@ -718,9 +721,9 @@ T+ 只需把当前单值 `alternate_data` 拆成“主替代字符 + 两个单�
 
 ### 10.1 强制功能用例
 
-- [ ] 开启功能后，输入 `si`、点击“笔”再写 `丿`，候选出现并可提交“偲”；
-- [ ] 输入 `hao`、点击“笔”再写 `丶`，候选出现并可提交“灏”；
-- [ ] 未点击“笔”时，在已有 composing 后继续左右短滑输入拼音，不会触发过滤；
+- [ ] 开启功能后，输入 `si`，候选出现后直接写 `丿`，可提交“偲”；
+- [ ] 输入 `hao`，候选出现后直接写 `丶`，可提交“灏”；
+- [ ] 已有 composing 后普通点按继续输入；较长左右短滑按已知取舍识别为横笔；
 - [ ] “笔”激活态可以再次点击退出，并在提交、取消、清空 composing、切换布局时自动退出；
 - [ ] 连续写一、二、三笔时，候选按完整前缀逐步缩小；
 - [ ] 退格先逐笔删除过滤前缀，再删除拼音；
@@ -737,14 +740,14 @@ T+ 只需把当前单值 `alternate_data` 拆成“主替代字符 + 两个单�
 
 - [ ] 无 composing 时，T+ PRESS 双字母行为不变；
 - [ ] 无 composing 时，左右短滑选单字母不变；
-- [ ] 无 composing 时，跨键滑行输入不变；
+- [ ] 设置关闭时跨键滑行输入不变；设置开启时当前 T+ 布局的跨键滑行不启动；
 - [ ] 14 个 T+ 组合键长按菜单均保留原数字/符号第一项，并显示对应单字母大小写；
 - [ ] 长按菜单的每个条目均能选中，取消 popup 不输出，lower/upper 两套模板一致；
 - [ ] 无 composing 和已有 composing 两种情况下，上屏文本、光标与 composing 变化均与 Google 原生中文 QWERTY 的对等长按一致；
 - [ ] 密码、URL、英文输入以及屏幕左右边缘键的 popup 行为正确；
 - [ ] 未激活“笔”时菜单滑选不被过滤器拦截；激活后主体长按被消费且不弹菜单，退出“笔”后恢复；
 - [ ] 有 composing 但未激活“笔”时，任何轨迹都不被误判成笔画；
-- [ ] 激活“笔”后，小于阈值的点击不产出笔画，明显横、竖、撇、点/捺、折均可识别；
+- [ ] 自动捕获时，小于阈值的点击不产出笔画且仍完成 Basic 点按，明显横、竖、撇、点/捺、折均可识别；
 - [ ] 功能关闭时所有行为与 `1.0.0` 一致；
 - [ ] 横竖屏、不同显示密度和触摸采样率下无明显误触。
 
@@ -766,7 +769,7 @@ T+ 只需把当前单值 `alternate_data` 拆成“主替代字符 + 两个单�
 1. `si + 丿 → 偲` 与 `hao + 丶 → 灏` 两个目标用例均通过；
 2. 过滤后首选候选的点击、空格和回车提交一致；
 3. 功能默认关闭，关闭时与 `1.0.0` 的 T+ 行为无差异；
-4. 14 个长按菜单的数字/符号与大小写单字母均可用，左右短滑和未激活“笔”时的滑行输入无回归；
+4. 14 个长按菜单的数字/符号与大小写单字母均可用，左右短滑无回归；设置关闭时滑行输入恢复，设置开启时 T+ 滑行输入关闭；
 5. 数据许可和 attribution 已进入仓库及发布说明；
 6. 至少完成一次真实设备验证。模拟器可验证逻辑和事件链，但最终触摸阈值不能只靠模拟器决定。
 
@@ -796,7 +799,7 @@ patches/res/xml/softkeys_input_zh_cn_pinyin_tplus.xml
 scripts/apply_patches.py
 scripts/verify_tplus.py                # 或由新的 verifier 调用
 工作解码树中的 HmmPinyinT9DecodeProcessor.smali
-工作解码树中的 AbstractHmmIme.smali
+工作解码树中的 AbstractHmmDecodeProcessor.smali
 设置页 XML 与 strings.xml 补丁生成逻辑
 ```
 
@@ -809,7 +812,7 @@ scripts/verify_tplus.py                # 或由新的 verifier 调用
 1. 阅读本文和 `docs/touchpal-tplus-port.md`，确认现有 T+ 手势与候选架构；
 2. 先完成 7.5 的 T+ 长按多候选 XML 小迭代、verifier、构建和实机菜单测试；
 3. 按本文已固定的 Conway commit/SHA-256，完成正则变体展开、紧凑数据生成和样例断言；
-4. 不接手势，给 `StrokeFilterCompat` 临时设置前缀 `3`，验证 `AbstractHmmIme` 深度候选过滤；
+4. 不接手势，给 `StrokeFilterCompat` 临时设置前缀 `3`，验证 `AbstractHmmDecodeProcessor` 深度候选过滤；
 5. 优先解决候选 session 的缓存重放/分批续扫、“第一个匹配项视觉高亮/空格提交”与“iterator 耗尽后是否存在偲”；
 6. 候选链验证稳定后，先做候选栏“笔”入口，再实现只在激活态认领的触摸轨迹处理器；
 7. 最后做设置项、轨迹视觉、阈值调优和可选的自动捕获实验模式。
@@ -843,7 +846,7 @@ scripts/verify_tplus.py                # 或由新的 verifier 调用
 | 已确认 | 模拟器中 `si` 首屏及四个展开页内未看到“偲” |
 | 已确认 | 固定 Conway commit/SHA-256 后，“偲”首笔为撇、“灏”首笔为点/捺；源字段是可含选择和反向引用的正则，不总是单序列 |
 | 已确认 | Google 现有中文 QWERTY 已支持 `1 q Q` 这类多候选长按，T+ 长按大小写菜单可复用同一 XML 机制 |
-| 推断 | 通过新增 motion handler 且只在显式“笔”状态下从主体 `DOWN` 立即认领，可以在不覆盖键盘 View 的情况下捕获笔画 |
+| 推断 | 通过排在 Basic 前的 motion handler 旁观 `DOWN`、越过 touch slop 后中途认领，可保留点按/静止长按并捕获笔画；左右短滑冲突是已知取舍 |
 | 待验证 | `DOWN` 立即认领能否稳定 reset Basic/gesture handler，且短轨迹被消费后不会回退触发 T+ `PRESS` |
 | 待验证 | Google 的 `si` 原生 iterator 最终是否包含“偲” |
 | 待验证 | `highlightCandidate()` 是否无 composing 副作用，以及空格/回车实际读取哪条默认候选路径；`selectCandidate()` 不得仅用于刷新 |

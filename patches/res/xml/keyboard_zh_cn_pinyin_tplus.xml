@@ -8,6 +8,7 @@
             <include href="@xml/keymapping_header_zh_cn_pinyin_qwerty" />
         </view>
         <view layout="@layout/keyboard_tplus_chinese_body" type="body">
+            <motion_event_handler class="com.google.android.apps.inputmethod.libs.hmm.StrokeFilterMotionEventHandler" reverse_preference="false" preference_key="@string/tplus_stroke_filter_preference_key" />
             <motion_event_handler class=".libs.framework.keyboard.handler.BasicMotionEventHandler" />
             <motion_event_handler class="com.google.android.apps.inputmethod.pinyin.keyboard.PinyinGestureHandler" reverse_preference="false" preference_key="@string/pref_key_enable_gesture_input" />
             <motion_event_handler class="com.google.android.apps.inputmethod.pinyin.keyboard.PinyinKeyboardLayoutHandler" reverse_preference="false" preference_key="@string/pref_key_enable_gesture_input" />

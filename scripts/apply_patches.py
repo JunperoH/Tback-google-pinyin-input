@@ -46,8 +46,8 @@ def apply(decoded: Path, application_id: str) -> None:
     replace_once(
         decoded / "apktool.yml",
         "versionInfo:\n  versionCode: 4520313\n  versionName: 4.5.2.193126728-arm64-v8a",
-        "versionInfo:\n  versionCode: 4520403\n"
-        "  versionName: 1.0.0",
+        "versionInfo:\n  versionCode: 4520406\n"
+        "  versionName: 1.1.0",
     )
 
     arrays = decoded / "res/values/arrays.xml"
@@ -183,6 +183,192 @@ def apply(decoded: Path, application_id: str) -> None:
         "    move-result-object v2\n\n"
         "    :mapping_ready",
     )
+    replace_once(
+        t9_processor,
+        ".method protected onHandleEvent(Lcom/google/android/apps/inputmethod/libs/"
+        "framework/core/Event;)Z\n"
+        "    .locals 5\n\n"
+        "    .prologue\n"
+        "    const/4 v4, 0x0\n\n"
+        "    const/4 v1, 0x1\n\n"
+        "    .line 14",
+        ".method protected onHandleEvent(Lcom/google/android/apps/inputmethod/libs/"
+        "framework/core/Event;)Z\n"
+        "    .locals 5\n\n"
+        "    .prologue\n"
+        "    const/4 v4, 0x0\n\n"
+        "    const/4 v1, 0x1\n\n"
+        "    iget-object v0, p1, Lcom/google/android/apps/inputmethod/libs/framework/"
+        "core/Event;->a:[Lcom/google/android/apps/inputmethod/libs/framework/core/KeyData;\n\n"
+        "    if-eqz v0, :stroke_filter_original_t9_event\n\n"
+        "    array-length v2, v0\n\n"
+        "    if-lez v2, :stroke_filter_original_t9_event\n\n"
+        "    aget-object v2, v0, v4\n\n"
+        "    iget v0, v2, Lcom/google/android/apps/inputmethod/libs/framework/core/KeyData;->a:I\n\n"
+        "    const v3, -0x9c45\n\n"
+        "    if-lt v0, v3, :stroke_filter_not_stroke_event\n\n"
+        "    const v3, -0x9c41\n\n"
+        "    if-gt v0, v3, :stroke_filter_not_stroke_event\n\n"
+        "    const v3, -0x9c40\n\n"
+        "    sub-int/2addr v3, v0\n\n"
+        "    invoke-static {v3}, Lcom/google/android/apps/inputmethod/libs/hmm/"
+        "StrokeFilterCompat;->appendStroke(I)Z\n\n"
+        "    return v1\n\n"
+        "    :stroke_filter_not_stroke_event\n"
+        "    const/16 v3, 0x43\n\n"
+        "    if-ne v0, v3, :stroke_filter_not_delete\n\n"
+        "    invoke-static {}, Lcom/google/android/apps/inputmethod/libs/hmm/"
+        "StrokeFilterCompat;->deleteStroke()Z\n\n"
+        "    move-result v3\n\n"
+        "    if-eqz v3, :stroke_filter_original_t9_event\n\n"
+        "    return v1\n\n"
+        "    :stroke_filter_not_delete\n"
+        "    const/16 v3, -0x2722\n\n"
+        "    if-eq v0, v3, :stroke_filter_try_ime_action\n\n"
+        "    const/16 v3, 0x42\n\n"
+        "    if-ne v0, v3, :stroke_filter_original_t9_event\n\n"
+        "    :stroke_filter_try_ime_action\n"
+        "    invoke-static {p0}, Lcom/google/android/apps/inputmethod/libs/hmm/"
+        "StrokeFilterCompat;->handleFilteredCommit(Lcom/google/android/apps/inputmethod/"
+        "libs/chinese/ime/hmm/AbstractHmmChineseDecodeProcessor;)Z\n\n"
+        "    move-result v3\n\n"
+        "    if-eqz v3, :stroke_filter_original_t9_event\n\n"
+        "    return v1\n\n"
+        "    :stroke_filter_original_t9_event\n"
+        "    .line 14",
+    )
+    replace_once(
+        t9_processor,
+        ".method public shouldHandle(Lcom/google/android/apps/inputmethod/libs/"
+        "framework/core/Event;)Z\n"
+        "    .locals 3\n\n"
+        "    .prologue\n"
+        "    const/4 v0, 0x0\n\n"
+        "    .line 13",
+        ".method public shouldHandle(Lcom/google/android/apps/inputmethod/libs/"
+        "framework/core/Event;)Z\n"
+        "    .locals 3\n\n"
+        "    .prologue\n"
+        "    const/4 v0, 0x0\n\n"
+        "    iget-object v1, p1, Lcom/google/android/apps/inputmethod/libs/framework/"
+        "core/Event;->a:[Lcom/google/android/apps/inputmethod/libs/framework/core/KeyData;\n\n"
+        "    if-eqz v1, :stroke_filter_original_should_handle\n\n"
+        "    array-length v2, v1\n\n"
+        "    if-lez v2, :stroke_filter_original_should_handle\n\n"
+        "    aget-object v1, v1, v0\n\n"
+        "    iget v1, v1, Lcom/google/android/apps/inputmethod/libs/framework/core/KeyData;->a:I\n\n"
+        "    const v2, -0x9c45\n\n"
+        "    if-lt v1, v2, :stroke_filter_original_should_handle\n\n"
+        "    const v2, -0x9c41\n\n"
+        "    if-gt v1, v2, :stroke_filter_original_should_handle\n\n"
+        "    const/4 v0, 0x1\n\n"
+        "    return v0\n\n"
+        "    :stroke_filter_original_should_handle\n"
+        "    .line 13",
+    )
+
+    # Basic remains live in automatic mode so taps and stationary long presses
+    # retain native semantics. Only a stale target at the start of a new touch
+    # is released; StrokeFilterMotionEventHandler then observes the same DOWN
+    # before Basic and claims only after movement crosses system touch slop.
+    motion_dispatcher = decoded / "smali/atu.smali"
+    replace_once(
+        motion_dispatcher,
+        ".method public final preHandleTouchEvent(Landroid/view/MotionEvent;)Z\n"
+        "    .locals 1\n\n"
+        "    .prologue\n"
+        "    .line 43",
+        ".method public final preHandleTouchEvent(Landroid/view/MotionEvent;)Z\n"
+        "    .locals 1\n\n"
+        "    invoke-virtual {p1}, Landroid/view/MotionEvent;->getActionMasked()I\n\n"
+        "    move-result v0\n\n"
+        "    if-nez v0, :stroke_filter_capture_original_prehandle\n\n"
+        "    invoke-static {}, Lcom/google/android/apps/inputmethod/libs/hmm/"
+        "StrokeFilterCompat;->isCaptureActive()Z\n\n"
+        "    move-result v0\n\n"
+        "    if-eqz v0, :stroke_filter_capture_original_prehandle\n\n"
+        "    const/4 v0, 0x0\n\n"
+        "    iput-object v0, p0, Latu;->a:Lcom/google/android/apps/inputmethod/"
+        "libs/framework/keyboard/IMotionEventHandler;\n\n"
+        "    return v0\n\n"
+        "    :stroke_filter_capture_original_prehandle\n"
+        "    .prologue\n"
+        "    .line 43",
+    )
+    replace_once(
+        motion_dispatcher,
+        ".method public final handleTouchEvent(Landroid/view/MotionEvent;)V\n"
+        "    .locals 3\n\n"
+        "    .prologue\n"
+        "    const/4 v2, 0x1",
+        ".method public final handleTouchEvent(Landroid/view/MotionEvent;)V\n"
+        "    .locals 3\n\n"
+        "    invoke-virtual {p1}, Landroid/view/MotionEvent;->getActionMasked()I\n\n"
+        "    move-result v0\n\n"
+        "    if-nez v0, :stroke_filter_capture_original_handle\n\n"
+        "    invoke-static {}, Lcom/google/android/apps/inputmethod/libs/hmm/"
+        "StrokeFilterCompat;->isCaptureActive()Z\n\n"
+        "    move-result v0\n\n"
+        "    if-eqz v0, :stroke_filter_capture_original_handle\n\n"
+        "    const/4 v0, 0x0\n\n"
+        "    iput-object v0, p0, Latu;->a:Lcom/google/android/apps/inputmethod/"
+        "libs/framework/keyboard/IMotionEventHandler;\n\n"
+        "    :stroke_filter_capture_original_handle\n"
+        "    .prologue\n"
+        "    const/4 v2, 0x1",
+    )
+
+    pinyin_gesture = decoded / (
+        "smali/com/google/android/apps/inputmethod/pinyin/keyboard/"
+        "PinyinGestureHandler.smali"
+    )
+    replace_once(
+        pinyin_gesture,
+        "    .line 9\n"
+        "    return-void\n"
+        ".end method\n\n"
+        ".method private static a([II)V",
+        "    .line 9\n"
+        "    return-void\n"
+        ".end method\n\n"
+        ".method public handle(Landroid/view/MotionEvent;)V\n"
+        "    .locals 1\n\n"
+        "    invoke-static {}, Lcom/google/android/apps/inputmethod/libs/hmm/"
+        "StrokeFilterCompat;->shouldDisableTPlusGesture()Z\n\n"
+        "    move-result v0\n\n"
+        "    if-nez v0, :stroke_filter_setting_skip_pinyin_gesture\n\n"
+        "    invoke-super {p0, p1}, Lcom/google/android/apps/inputmethod/libs/gestureui/"
+        "AbstractGestureMotionEventHandler;->handle(Landroid/view/MotionEvent;)V\n\n"
+        "    :stroke_filter_setting_skip_pinyin_gesture\n"
+        "    return-void\n"
+        ".end method\n\n"
+        ".method private static a([II)V",
+    )
+
+    pinyin_layout = decoded / (
+        "smali/com/google/android/apps/inputmethod/pinyin/keyboard/"
+        "PinyinKeyboardLayoutHandler.smali"
+    )
+    replace_once(
+        pinyin_layout,
+        "    return-void\n"
+        ".end method\n\n\n"
+        "# virtual methods",
+        "    return-void\n"
+        ".end method\n\n"
+        ".method public handle(Landroid/view/MotionEvent;)V\n"
+        "    .locals 1\n\n"
+        "    invoke-static {}, Lcom/google/android/apps/inputmethod/libs/hmm/"
+        "StrokeFilterCompat;->shouldDisableTPlusGesture()Z\n\n"
+        "    move-result v0\n\n"
+        "    if-nez v0, :stroke_filter_setting_skip_pinyin_layout\n\n"
+        "    invoke-super {p0, p1}, Lcom/google/android/apps/inputmethod/pinyin/keyboard/"
+        "AbstractPinyinKeyboardLayoutHandler;->handle(Landroid/view/MotionEvent;)V\n\n"
+        "    :stroke_filter_setting_skip_pinyin_layout\n"
+        "    return-void\n"
+        ".end method\n\n\n"
+        "# virtual methods",
+    )
 
     tplus_mapping_src = ROOT / "patches/smali/TPlusKeyMapping.smali"
     tplus_mapping_dst = decoded / (
@@ -192,6 +378,175 @@ def apply(decoded: Path, application_id: str) -> None:
         raise RuntimeError(f"Refusing to overwrite existing helper: {tplus_mapping_dst}")
     tplus_mapping_dst.parent.mkdir(parents=True, exist_ok=True)
     shutil.copyfile(tplus_mapping_src, tplus_mapping_dst)
+
+    # Install the replayable stroke-filter candidate session and keep the
+    # shared HMM base class dormant unless a T+ lifecycle token, setting and
+    # non-empty prefix are all active.
+    stroke_helpers = sorted((ROOT / "patches/smali").glob("StrokeFilter*.smali"))
+    if len(stroke_helpers) < 5:
+        raise RuntimeError("Missing generated stroke-filter helpers")
+    stroke_helper_dir = decoded / "smali/com/google/android/apps/inputmethod/libs/hmm"
+    for helper_src in stroke_helpers:
+        helper_dst = stroke_helper_dir / helper_src.name
+        if helper_dst.exists():
+            raise RuntimeError(f"Refusing to overwrite existing helper: {helper_dst}")
+        shutil.copyfile(helper_src, helper_dst)
+
+    abstract_hmm = decoded / (
+        "smali/com/google/android/apps/inputmethod/libs/hmm/AbstractHmmDecodeProcessor.smali"
+    )
+    replace_once(
+        abstract_hmm,
+        "    .line 4\n"
+        "    invoke-virtual {p0}, Lcom/google/android/apps/inputmethod/libs/hmm/"
+        "AbstractHmmDecodeProcessor;->getHmmEngineFactory()Lcom/google/android/apps/inputmethod/"
+        "libs/hmm/AbstractHmmEngineFactory;",
+        "    invoke-virtual {p1}, Landroid/content/Context;->getApplicationContext()"
+        "Landroid/content/Context;\n\n"
+        "    move-result-object v0\n\n"
+        "    invoke-static {v0}, Lcom/google/android/apps/inputmethod/libs/hmm/"
+        "StrokeFilterCompat;->initialize(Landroid/content/Context;)V\n\n"
+        "    .line 4\n"
+        "    invoke-virtual {p0}, Lcom/google/android/apps/inputmethod/libs/hmm/"
+        "AbstractHmmDecodeProcessor;->getHmmEngineFactory()Lcom/google/android/apps/inputmethod/"
+        "libs/hmm/AbstractHmmEngineFactory;",
+    )
+    replace_once(
+        abstract_hmm,
+        "    .line 48\n"
+        "    iput-object p1, p0, Lcom/google/android/apps/inputmethod/libs/hmm/"
+        "AbstractHmmDecodeProcessor;->mTextCandidateIterator:Ljava/util/Iterator;",
+        "    .line 48\n"
+        "    iput-object p1, p0, Lcom/google/android/apps/inputmethod/libs/hmm/"
+        "AbstractHmmDecodeProcessor;->mTextCandidateIterator:Ljava/util/Iterator;\n\n"
+        "    invoke-static {p0, p1}, Lcom/google/android/apps/inputmethod/libs/hmm/"
+        "StrokeFilterCompat;->onSetTextCandidates(Lcom/google/android/apps/inputmethod/"
+        "libs/hmm/AbstractHmmDecodeProcessor;Ljava/util/Iterator;)V",
+    )
+    replace_once(
+        abstract_hmm,
+        ".method protected final onRequestCandidates(I)Z\n"
+        "    .locals 5\n\n"
+        "    .prologue\n"
+        "    .line 69\n"
+        "    new-instance v2, Ljava/util/ArrayList;",
+        ".method protected final onRequestCandidates(I)Z\n"
+        "    .locals 5\n\n"
+        "    .prologue\n"
+        "    invoke-static {p0, p1}, Lcom/google/android/apps/inputmethod/libs/hmm/"
+        "StrokeFilterCompat;->requestCandidates(Lcom/google/android/apps/inputmethod/"
+        "libs/hmm/AbstractHmmDecodeProcessor;I)Z\n\n"
+        "    move-result v0\n\n"
+        "    if-eqz v0, :stroke_filter_original_candidates\n\n"
+        "    const/4 v0, 0x1\n\n"
+        "    return v0\n\n"
+        "    :stroke_filter_original_candidates\n"
+        "    .line 69\n"
+        "    new-instance v2, Ljava/util/ArrayList;",
+    )
+    replace_once(
+        abstract_hmm,
+        ".method private resetInternalStates()V\n"
+        "    .locals 2\n\n"
+        "    .prologue\n"
+        "    const/4 v1, 0x0",
+        ".method private resetInternalStates()V\n"
+        "    .locals 2\n\n"
+        "    .prologue\n"
+        "    invoke-static {p0}, Lcom/google/android/apps/inputmethod/libs/hmm/"
+        "StrokeFilterCompat;->onResetInternalStates(Lcom/google/android/apps/"
+        "inputmethod/libs/hmm/AbstractHmmDecodeProcessor;)V\n\n"
+        "    const/4 v1, 0x0",
+    )
+
+    chinese_decode = decoded / (
+        "smali/com/google/android/apps/inputmethod/libs/chinese/ime/hmm/"
+        "AbstractHmmChineseDecodeProcessor.smali"
+    )
+    replace_once(
+        chinese_decode,
+        ".method public final a(Ljava/lang/String;)Z\n"
+        "    .locals 2\n\n"
+        "    .prologue\n"
+        "    const/4 v0, 0x1",
+        ".method public final a(Ljava/lang/String;)Z\n"
+        "    .locals 2\n\n"
+        "    .prologue\n"
+        "    invoke-static {p0}, Lcom/google/android/apps/inputmethod/libs/hmm/"
+        "StrokeFilterCompat;->handleFilteredCommit(Lcom/google/android/apps/"
+        "inputmethod/libs/chinese/ime/hmm/AbstractHmmChineseDecodeProcessor;)Z\n\n"
+        "    move-result v1\n\n"
+        "    if-eqz v1, :stroke_filter_original_space\n\n"
+        "    const/4 v0, 0x1\n\n"
+        "    return v0\n\n"
+        "    :stroke_filter_original_space\n"
+        "    const/4 v0, 0x1",
+    )
+    replace_once(
+        chinese_decode,
+        ".method public final a(Ljava/lang/String;Ljava/lang/String;)Z\n"
+        "    .locals 13\n\n"
+        "    .prologue\n"
+        "    const/4 v9, 0x0",
+        ".method public final a(Ljava/lang/String;Ljava/lang/String;)Z\n"
+        "    .locals 13\n\n"
+        "    .prologue\n"
+        "    invoke-static {p0}, Lcom/google/android/apps/inputmethod/libs/hmm/"
+        "StrokeFilterCompat;->handleFilteredCommit(Lcom/google/android/apps/"
+        "inputmethod/libs/chinese/ime/hmm/AbstractHmmChineseDecodeProcessor;)Z\n\n"
+        "    move-result v0\n\n"
+        "    if-eqz v0, :stroke_filter_original_enter\n\n"
+        "    const/4 v0, 0x1\n\n"
+        "    return v0\n\n"
+        "    :stroke_filter_original_enter\n"
+        "    const/4 v9, 0x0",
+    )
+
+    # Refresh the explicit stroke toggle after every candidate-holder append,
+    # including the early-return cases that share the method's return label.
+    candidate_holder = decoded / (
+        "smali/com/google/android/apps/inputmethod/libs/framework/keyboard/widget/"
+        "FixedSizeCandidatesHolderView.smali"
+    )
+    replace_once(
+        candidate_holder,
+        "    .line 135\n"
+        "    :cond_0\n"
+        "    :goto_0\n"
+        "    return v2",
+        "    .line 135\n"
+        "    :cond_0\n"
+        "    :goto_0\n"
+        "    invoke-virtual {p0}, Lcom/google/android/apps/inputmethod/libs/framework/"
+        "keyboard/widget/FixedSizeCandidatesHolderView;->getRootView()Landroid/view/View;\n\n"
+        "    move-result-object v0\n\n"
+        "    invoke-static {v0}, Lcom/google/android/apps/inputmethod/libs/hmm/"
+        "StrokeFilterCompat;->updateToggle(Landroid/view/View;)V\n\n"
+        "    return v2",
+    )
+
+    # Insert the default-off option into the Chinese-input category without
+    # replacing Google's settings resource wholesale.
+    setting_input = decoded / "res/xml/setting_input.xml"
+    replace_once(
+        setting_input,
+        "        <ListPreference android:entries=\"@array/entries_pinyin_scheme\" "
+        "android:title=\"@string/setting_pinyin_scheme_title\" android:key=\"@string/"
+        "pref_key_pinyin_scheme\" android:summary=\"%s\" android:defaultValue=\"@string/"
+        "pref_def_value_pinyin_scheme\" android:dialogTitle=\"@string/"
+        "setting_pinyin_scheme_title\" android:entryValues=\"@array/"
+        "entryvalues_pinyin_scheme\" />",
+        "        <ListPreference android:entries=\"@array/entries_pinyin_scheme\" "
+        "android:title=\"@string/setting_pinyin_scheme_title\" android:key=\"@string/"
+        "pref_key_pinyin_scheme\" android:summary=\"%s\" android:defaultValue=\"@string/"
+        "pref_def_value_pinyin_scheme\" android:dialogTitle=\"@string/"
+        "setting_pinyin_scheme_title\" android:entryValues=\"@array/"
+        "entryvalues_pinyin_scheme\" />\n"
+        "        <CheckBoxPreference android:persistent=\"true\" android:title=\"@string/"
+        "stroke_filter_setting_title\" android:key=\"tplus_stroke_filter_enabled\" "
+        "android:summary=\"@string/stroke_filter_setting_summary\" "
+        "android:defaultValue=\"false\" />",
+    )
 
     # PinyinKeyboardLayoutHandler normally publishes only the first code point
     # of a DECODE key to the gesture engine. T+ keys carry one or two ASCII

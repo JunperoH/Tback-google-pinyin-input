@@ -3,11 +3,11 @@
 | 文档属性 | 值 |
 | --- | --- |
 | 上游方案 | [T+ 拼音笔画过滤研究与接力实现方案](tplus-stroke-filter-research.md) |
-| 目标版本 | `1.1.0` 测试版 |
+| 目标版本 | `1.1.0` 迭代试做（内部 `versionCode` 单调递增） |
 | 计划日期 | 2026-08-02 |
-| 状态 | 可开工；关键可行性门槛尚未验证 |
-| 默认范围 | T+ 长按多候选 + 显式“笔”模式 + Google 原候选过滤 |
-| 明确不做 | Okinawa 移植、自动捕获默认开启、替换 Google 独立笔画输入法、稀有字补充候选 |
+| 状态 | M0–M7 已实现；正在试做自动捕获与可见轨迹并回归模拟器 |
+| 默认范围 | T+ 长按多候选 + 自动笔画旁观 + 主题化轨迹 + Google 原候选过滤 |
+| 明确不做 | Okinawa 移植、替换 Google 独立笔画输入法、稀有字补充候选 |
 
 ## 1. 执行原则与排期假设
 
@@ -172,7 +172,7 @@ scripts/verify_stroke_filter.py
 scripts/instrument_stroke_filter_spike.py
 
 目标解码文件（只通过 apply_patches.py 修改，不直接提交）：
-smali/com/google/android/apps/inputmethod/libs/hmm/AbstractHmmIme.smali
+smali/com/google/android/apps/inputmethod/libs/hmm/AbstractHmmDecodeProcessor.smali
 smali/com/google/android/apps/inputmethod/pinyin/ime/hmm/HmmPinyinT9DecodeProcessor.smali
 ```
 
@@ -180,12 +180,12 @@ smali/com/google/android/apps/inputmethod/pinyin/ime/hmm/HmmPinyinT9DecodeProces
 
 - [ ] `StrokeFilterData` 首次使用时通过 `Resources.getIdentifier("stroke_filter_data", "raw", packageName)` 解析新增资源 ID，再用 `openRawResource(id)` + `DataInputStream` 懒加载不可变索引；校验 header、边界、排序和来源摘要。smali 中不得硬编码易随 aapt2 重排的 `0x7f...` ID，`getIdentifier` 返回 0 时 fail-open。
 - [ ] 二进制固定为小端；`DataInputStream` 只用于 `readUnsignedByte/readFully`。实现 `readU16LE()` 和 `readU32LE()` 逐字节组装，禁止直接使用默认大端的 `readShort/readInt`。Python verifier 用同一组跨语言 fixture 断言每个字段值。
-- [ ] 在 `AbstractHmmIme.initialize(Context, ImeDef, IImeDelegate)` 的单一稳定锚点把 `p1.getApplicationContext()` 交给 `StrokeFilterCompat.initialize()`；只保存 application context，初始化时不立即读文件。
+- [x] 在实包 `AbstractHmmDecodeProcessor.initialize(Context, ImeDef, IImeDelegate)` 的单一稳定锚点把 application context 交给 `StrokeFilterCompat.initialize()`；只保存 application context，初始化时不立即读文件。
 - [ ] 资源加载失败时只记录一次受控日志，本会话禁用过滤；不能让 IME 初始化失败。
 - [ ] `scripts/instrument_stroke_filter_spike.py` 只对指定的干净解码副本注入临时 `enableTestMode(tplusToken=true, settingEnabled=true, prefix="3")` 方法及一次调用；正式 `patches/smali/StrokeFilterCompat.smali` 不包含该方法。测试注入必须同时提供 M4 守卫要求的生命周期 token、设置值和前缀，不能只改 prefix。
 - [ ] Spike 使用单独的 `work/stroke-filter-spike-decoded/` 干净解码副本；测试调用只存在于该忽略目录，不写入 `patches/`，也不修改只读研究基线 `work/analysis/google-decoded/`。九键、QWERTY 和独立笔画路径保持关闭。
-- [ ] 在 `AbstractHmmIme.setTextCandidates(Iterator)` 新 iterator 到来时建立 composing session；在 `resetInternalStates()` 销毁 session。
-- [ ] 在 `AbstractHmmIme.requestCandidates(int)` 的原循环内扫描，而不是过滤已经显示的六个候选；每个原 Candidate 先入缓存，再匹配显示文字的首个 Han code point。
+- [x] 在 `AbstractHmmDecodeProcessor.setTextCandidates(Iterator)` 新 iterator 到来时建立 composing session；在 `resetInternalStates()` 销毁 session。
+- [x] 在 `AbstractHmmDecodeProcessor.onRequestCandidates(int)` 的原循环前扫描，而不是过滤已经显示的六个候选；每个原 Candidate 先入缓存，再匹配显示文字的首个 Han code point，未激活时原循环原样执行。
 - [ ] 只保留原 Candidate 对象，不重新构造 payload。
 - [ ] 日志只记录受控样例的扫描数量、是否耗尽、命中字和 Candidate 类型，不记录日常输入。
 - [ ] 查明 `requestCandidates()` 中第二个 `appendTextCandidates` 参数的实际语义；分别验证视觉高亮、空格/回车默认目标和点击提交。
@@ -253,7 +253,7 @@ pendingRunnable
 
 ### 7.3 共享类保护
 
-过滤挂点位于共享 `AbstractHmmIme`，每次进入分支前必须同时满足：
+过滤挂点位于共享 `AbstractHmmDecodeProcessor`，每次进入分支前必须同时满足：
 
 ```text
 T+ 生命周期 token 有效
@@ -273,7 +273,7 @@ M4 尚未注册正式 T+ 生命周期 handler，动态验收由 M3 的一次性�
 目标解码文件：
 
 ```text
-smali/com/google/android/apps/inputmethod/libs/hmm/AbstractHmmIme.smali
+smali/com/google/android/apps/inputmethod/libs/hmm/AbstractHmmDecodeProcessor.smali
 smali/com/google/android/apps/inputmethod/libs/chinese/ime/hmm/AbstractHmmChineseDecodeProcessor.smali
 ```
 
@@ -381,31 +381,39 @@ smali/com/google/android/apps/inputmethod/pinyin/ime/hmm/HmmPinyinT9DecodeProces
 
 ### 9.2 Handler 协议
 
-- [ ] 保持 M5 中 handler 位于 `BasicMotionEventHandler` 之前的注册顺序。
-- [ ] `activate/deactivate/close` 建立和销毁 T+ 生命周期 token；离开键盘立即清理轨迹和 pending 状态。
-- [ ] 未进入“笔”时 `acceptInitialEvent=false`，绝不调用 `declareTargetHandler()`。
-- [ ] 已进入“笔”且 composing 有效时，键盘主体 `DOWN` 即认领；Basic/gesture 被 reset。
-- [ ] 过短轨迹只消费、不分类、不回退为 T+ PRESS。
-- [ ] 激活态下键盘主体的点击、长按、短滑和跨键滑行有意不可用；用户通过候选栏“笔”退出。
-- [ ] 通过 `IMotionEventHandlerDelegate.fireEvent(Event)` 发送专用内部事件；先扫描现有 keycode，选取无冲突值并在 verifier 中锁定。
-- [ ] `HmmPinyinT9DecodeProcessor` 在普通 T+/T9 映射之前拦截内部笔画事件，追加 `1..5` 前缀并触发候选刷新，不送入 HMM 拼音 decode。
+- [x] 保持 M5 中 handler 位于 `BasicMotionEventHandler` 之前的注册顺序。
+- [x] composing 建立后若旧 Basic target 仍占用下一段触摸，只在自动捕获有效的新 `ACTION_DOWN` 于 `atu` 的 preHandle/handle 入口释放；Basic 保持原实现。两条 Pinyin 手势链按 `tplusActive && settingEnabled` 门控关闭跨键滑行。
+- [x] `activate/deactivate/close` 建立和销毁 T+ 生命周期 token；T+ 专用 stroke handler 在每次触摸进入共享 Pinyin handlers 前刷新 token，离开键盘立即清理轨迹和 pending 状态。
+- [x] composing 与数据有效时自动进入旁观；`DOWN` 开始采样但不立即认领。
+- [x] 最大位移越过系统 touch slop 后才认领；Basic/其他 handler 此时被 reset。
+- [x] 未越阈值的点按与静止长按不产出笔画，继续由 Basic 完成。
+- [x] 较长键内左右滑会优先成为横笔；用户可通过候选栏“笔”暂停当前 composing 的自动捕获。
+- [x] 轨迹由非交互式 `StrokeFilterTrailView` 使用主题手势色绘制，抬手后淡出；不复用或唤醒滑行解码器。
+- [x] 通过 `IMotionEventHandlerDelegate.fireEvent(Event)` 发送专用内部事件；先扫描现有 keycode，选取无冲突值并在 verifier 中锁定。
+- [x] `HmmPinyinT9DecodeProcessor` 在普通 T+/T9 映射之前拦截内部笔画事件，追加 `1..5` 前缀并触发候选刷新，不送入 HMM 拼音 decode。
 
 ### 9.3 几何分类
 
-- [ ] 使用 `ViewConfiguration.getScaledTouchSlop()`、键盘宽高归一化坐标和采样点抽稀，不硬编码 TouchPal 的 20 px。
-- [ ] 直线主方向区分横、竖、撇、点/捺；明显方向切换归折。
-- [ ] 最多保存五笔；第六笔给出轻提示但不修改前缀。
+- [x] 使用 `ViewConfiguration.getScaledTouchSlop()`、键盘宽高归一化坐标和采样点抽稀，不硬编码 TouchPal 的 20 px。
+- [x] 直线主方向区分横、竖、撇、点/捺；明显方向切换归折。
+- [x] 最多保存五笔；第六笔给出轻提示但不修改前缀。
 - [ ] 调试构建只记录轨迹长度、角度、转折数、分类和置信度；不记录候选文字或上传数据。
 
 ### 9.4 手势验收
 
-- [ ] 未激活“笔”：T+ PRESS、左右短滑、长按 popup、跨键滑行与 `1.0.0` 一致。
-- [ ] 激活“笔”：五类轨迹各连续测试 20 次，目标单类命中率至少 90%，且无跨到原 handler 的事件。
-- [ ] 小于 slop 的触摸不产出笔画，也不输入字母。
-- [ ] 激活态长按不弹 popup；退出后 popup 立即恢复。
+- [ ] 设置关闭：T+ PRESS、左右短滑、长按 popup、跨键滑行与 `1.0.0` 一致。
+- [ ] 设置开启且 composing 建立：普通点按继续输入、静止长按仍弹 popup、跨键滑行关闭、越阈值轨迹分类为笔画。
+- [ ] 五类轨迹各连续测试 20 次，目标单类命中率至少 90%，且轨迹即时可见并在抬手后淡出。
+- [ ] 小于 slop 的触摸不产出笔画，且原 Basic 点按正常完成。
 - [ ] 不同密度、横竖屏和至少一台真实设备完成调参。
 
-自动捕获不在 M6 范围内。若未来实验，必须单独建分支和验收矩阵，不在当前 handler 中增加隐式模式分支。
+2026-08-02 模拟器回归记录：在 Android 14 / API 34 竖屏模拟器中，用正式包反解副本仅加入受控日志，先产生 composing，再按实际候选栏坐标点击“笔”。按钮返回捕获态 `true`；随后在键盘主体画横，完整收到 `ACTION_DOWN → ACTION_MOVE → ACTION_UP`，`atu` 的目标为 `StrokeFilterMotionEventHandler`，分类结果为 `1`（横）。测试后已覆盖恢复无日志正式 APK，设备 `base.apk` 与 `dist` APK 的 SHA-256 一致，且未出现崩溃或 `VerifyError`。该记录不替代上方五类各 20 次、横屏和真实设备矩阵。
+
+2026-08-02 前一 `1.1.0` 试做（内部 code `4520405`）模拟器回归记录：在同一 API 34 模拟器中确认设置实际开启后，未点“笔”直接跨键长滑；两条 Pinyin handler 对 `DOWN/MOVE/UP` 的门控均为 `true` 并逐事件返回，未产生 `PinyinGestureHandler` target，输入框保持空白。随后普通单键仍由 `BasicMotionEventHandler` 处理，真实点击“笔”返回 `true`，画横由 `StrokeFilterMotionEventHandler` 接管并分类为 `1`。最后覆盖安装无日志正式试做包，设备 `base.apk` 与 `dist` APK 的 SHA-256 一致。
+
+2026-08-02 自动捕获试做（`versionName=1.1.0`、`versionCode=4520406`）模拟器回归记录：先确认 16KB page-size 镜像会按已知限制拒绝 4KB 对齐的 `libhmm_gesture_hwr_zh.so`，随后在 `TPlus_API34_4K`（API 34、page size 4096、1080×2400、420dpi）覆盖安装。首次 T+ 点按建立 composing 后候选栏自动显示激活态；未点“笔”再普通点按，Basic 正常更新 composing。注入 1.6 秒横划时，中途截图可见主题色圆角轨迹；抬手后候选从普通拼音候选切换为“十分/三/事/所/死”等首笔横结果，轨迹随后清除。自动状态下对 OP 静止长按 1 秒，原 `P/O/p/o/5` popup 正常显示。全过程无 `FATAL EXCEPTION`、`VerifyError`、`NoSuchFieldError` 或 `NoSuchMethodError`；设备 `base.apk` 与 dist APK 的 SHA-256 同为 `BE5BBC69F572C1260250D8CB47DA60215E1750366F754256739430BA05D0CE1F`。测试后两台模拟器默认输入法均恢复为触宝。
+
+2026-08-02 范围变更：根据试用反馈，在仍标记为 `1.1.0` 的迭代试做中加入自动旁观与可见轨迹；不创建 `1.1.2` 标签。Android `versionName` 保持 `1.1.0`，每个可覆盖安装的试验包只递增内部 `versionCode` 并使用独立文件名保留旧 APK。
 
 建议提交：
 
@@ -441,13 +449,13 @@ python scripts/verify_stroke_filter.py work/decoded
 
 ### 10.2 最终签名 APK 的可执行验证
 
-先确认构建或 CI 已把最终文件命名为 `ComebackGooglePinyinInput-TPlus-arm64-v8a-1.1.0.apk`，然后执行：
+先确认正式产物使用完整文件名 `ComebackGooglePinyinInput-TPlus-arm64-v8a-1.1.0.apk`，然后执行：
 
 ```powershell
 $releaseApk = (Resolve-Path `
   '.\dist\ComebackGooglePinyinInput-TPlus-arm64-v8a-1.1.0.apk').Path
 $verifyDir = Join-Path (Resolve-Path '.\work').Path `
-  'verification-tplus-110-final'
+  'verification-tplus-111-final'
 $buildTools = '<Android SDK build-tools 目录>'
 
 java -jar .\tools\apktool.jar d -f -o $verifyDir $releaseApk
@@ -464,7 +472,7 @@ adb install -r $releaseApk
 adb shell ime list -s
 ```
 
-命令输出必须确认：包名正确、`versionName=1.1.0`、versionCode 已递增、只有预期 ABI、zipalign 通过、v1/v2/v3 签名和证书 SHA-256 正确。`adb install -r` 后再执行 10.4 的设备矩阵。
+命令输出必须确认：包名正确、`versionName=1.1.0`、`versionCode=4520406`、只有预期 ABI、zipalign 通过、v1/v2/v3 签名和证书 SHA-256 正确。`adb install -r` 后再执行 10.4 的设备矩阵。
 
 可重复补丁验证：
 
@@ -481,13 +489,13 @@ python .\scripts\verify_reproducible_patch.py `
 
 ### 10.3 反向验证清单
 
-- [ ] 发布时把 `versionName` 设为 `1.1.0`，`versionCode` 必须大于最后已发布值 `4520403`；若 M1 曾以 `1.0.1` 独立发布，则在其 versionCode 基础上再递增，不能预先复用同一个值。
-- [ ] 同步更新 `scripts/apply_patches.py`、`.github/workflows/build-release.yml`、README、CHANGELOG 和 Release APK 文件名中的版本身份。
-- [ ] 对最终签名 APK 再做一次独立 apktool decode。
-- [ ] 验证 `stroke_filter_data.bin`、设置字符串、handler XML、三个候选 helper 和 motion handler 实际进入 APK。
-- [ ] 验证包名、ABI、`versionName`、递增后的 `versionCode`、zipalign 和 v1/v2/v3 签名。
-- [ ] 运行两套 verifier 指向反向解码目录。
-- [ ] 对两个独立干净 decode 的补丁结果做哈希比较，证明构建可重复。
+- [x] 正式 `versionName` 为 `1.1.0`，`versionCode` 为 `4520406`；Release Assets 使用完整文件名且不设置显示别名，旧试做 APK 在本地保留。
+- [x] 同步更新 `scripts/apply_patches.py`、`.github/workflows/build-release.yml`、README、CHANGELOG 和 Release APK 文件名中的版本身份。
+- [x] 对最终签名 APK 再做一次独立 apktool decode。
+- [x] 验证 `stroke_filter_data.bin`、设置字符串、handler XML、三个候选 helper 和 motion handler 实际进入 APK。
+- [x] 验证包名、ABI、`versionName`、递增后的 `versionCode`、zipalign 和 v1/v2/v3 签名。
+- [x] 运行两套 verifier 指向反向解码目录。
+- [x] 对两个独立干净 decode 的补丁结果做哈希比较，证明构建可重复。
 
 ### 10.4 设备矩阵
 
@@ -509,8 +517,8 @@ python .\scripts\verify_reproducible_patch.py `
 - [ ] 长按 14 键矩阵全部通过。
 - [ ] 功能默认关闭；关闭时与 `1.0.0` 无行为差异。
 - [ ] 数据损坏只禁用过滤，不影响任何原输入法。
-- [ ] 覆盖安装上一正式版后，布局选择和用户数据保留。
-- [ ] README、CHANGELOG、版本号、Release Notes、许可证和 attribution 同步。
+- [x] 覆盖安装上一正式版后，布局选择和用户数据保留。
+- [x] README、CHANGELOG、版本号、Release Notes、许可证和 attribution 同步。
 
 ## 11. 分支、提交与回滚策略
 
