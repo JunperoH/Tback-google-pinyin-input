@@ -55,6 +55,10 @@ object BooleanSettingContracts {
         key = "enable_sc_tc_conversion",
         defaultValue = false,
     )
+    val tplusStrokeFilter = BooleanSettingContract(
+        key = "tplus_stroke_filter_enabled",
+        defaultValue = false,
+    )
     val chinesePrediction = BooleanSettingContract(
         key = "enable_chinese_prediction",
         defaultValue = true,
@@ -161,6 +165,9 @@ object BooleanSettingContracts {
         automaticSpace,
         blockOffensiveWords,
     )
+    val tplusBatch = listOf(
+        tplusStrokeFilter,
+    )
     val capabilityGatedKeyboardBatch = listOf(
         popupOnKeypress,
         voiceInput,
@@ -197,7 +204,7 @@ object BooleanSettingContracts {
         fuzzyPinyinIanIang,
         fuzzyPinyinUanUang,
     )
-    val writable = firstPlainBatch + secondPlainBatch + thirdPlainBatch +
+    val writable = firstPlainBatch + secondPlainBatch + thirdPlainBatch + tplusBatch +
         capabilityGatedKeyboardBatch + headerShortcutBatch +
         languageSwitchDependencyBatch + englishDependencyBatch + gestureDependencyBatch + fuzzyPinyin +
         fuzzyPinyinOptionBatch

@@ -51,6 +51,18 @@ class BooleanSettingContractsTest {
     }
 
     @Test
+    fun tplusStrokeFilterPreservesExactKeyAndDefault() {
+        assertEquals(
+            listOf("tplus_stroke_filter_enabled"),
+            BooleanSettingContracts.tplusBatch.map { it.key },
+        )
+        assertEquals(
+            listOf(false),
+            BooleanSettingContracts.tplusBatch.map { it.defaultValue },
+        )
+    }
+
+    @Test
     fun capabilityGatedKeyboardBatchPreservesExactKeysAndDefaults() {
         assertEquals(
             listOf("enable_popup_on_keypress", "enable_voice_input"),

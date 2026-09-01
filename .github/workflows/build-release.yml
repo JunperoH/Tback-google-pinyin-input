@@ -5,7 +5,7 @@ on:
     branches:
       - master
     tags:
-      - "v*"
+      - "tplus-v*"
   workflow_dispatch:
     inputs:
       application_id:
@@ -39,7 +39,7 @@ env:
   APKTOOL_SHA256: "66cf4524a4a45a7f56567d08b2c9b6ec237bcdd78cee69fd4a59c8a0243aeafa"
   ORIGINAL_APK: original/google-pinyin-input-4.5.2.193126728-arm64-v8a.apk
   ORIGINAL_APK_SHA256: "980fd0f4695f683648e6f7ab9a15a24732e8957b5b14b25d49af931176574bd7"
-  FORMAL_APPLICATION_ID: com.google.android.inputmethod.pinyin.compat
+  FORMAL_APPLICATION_ID: com.google.android.inputmethod.pinyin.compat.tplus
 
 jobs:
   build:
@@ -51,7 +51,7 @@ jobs:
       KEY_PASSWORD: ${{ secrets.ANDROID_SIGNING_KEY_PASSWORD }}
       KEY_ALIAS: ${{ vars.ANDROID_SIGNING_KEY_ALIAS }}
       EXPECTED_CERT_SHA256: ${{ vars.ANDROID_SIGNING_CERT_SHA256 }}
-      APPLICATION_ID: ${{ inputs.application_id || vars.ANDROID_APPLICATION_ID }}
+      APPLICATION_ID: ${{ inputs.application_id || vars.ANDROID_APPLICATION_ID || 'com.google.android.inputmethod.pinyin.compat.tplus' }}
       ARTIFACT_LABEL: ${{ inputs.artifact_name || github.sha }}
       AUDIT_LABEL: ${{ inputs.audit_label || 'Settings Audit' }}
       DEBUGGABLE: ${{ inputs.debuggable || 'false' }}
@@ -93,11 +93,11 @@ jobs:
             throw "Invalid VERSION_NAME: $($properties.VERSION_NAME)"
           }
           $versionCode = 0L
-          if (-not [long]::TryParse($properties.VERSION_CODE, [ref]$versionCode) -or $versionCode -le 4520385) {
-            throw "VERSION_CODE must be numeric and greater than the v2.0.0 code 4520385"
+          if (-not [long]::TryParse($properties.VERSION_CODE, [ref]$versionCode) -or $versionCode -le 4520406) {
+            throw "VERSION_CODE must be numeric and greater than the T+ v1.1.0 code 4520406"
           }
           if ($env:GITHUB_REF -like 'refs/tags/*') {
-            $expectedTag = "v$($properties.VERSION_NAME)"
+            $expectedTag = "tplus-v$($properties.VERSION_NAME)"
             if ($env:GITHUB_REF_NAME -ne $expectedTag) {
               throw "Tag $env:GITHUB_REF_NAME does not match version.properties ($expectedTag)"
             }
@@ -112,7 +112,7 @@ jobs:
           "EXPECTED_VERSION_CODE=$($properties.VERSION_CODE)" | Out-File $env:GITHUB_ENV -Encoding utf8 -Append
           "EXPECTED_TARGET_SDK=$($properties.TARGET_SDK)" | Out-File $env:GITHUB_ENV -Encoding utf8 -Append
           "EXPECTED_RELEASE_TITLE=$($properties.RELEASE_TITLE)" | Out-File $env:GITHUB_ENV -Encoding utf8 -Append
-          "RELEASE_APK_NAME=ComebackGooglePinyinInput-arm64-v8a-$($properties.VERSION_NAME).apk" | Out-File $env:GITHUB_ENV -Encoding utf8 -Append
+          "RELEASE_APK_NAME=ComebackGooglePinyinInput-TPlus-arm64-v8a-$($properties.VERSION_NAME).apk" | Out-File $env:GITHUB_ENV -Encoding utf8 -Append
 
       - name: Validate repository configuration
         shell: pwsh
@@ -204,11 +204,23 @@ jobs:
           python @arguments
           if ($LASTEXITCODE -ne 0) { throw "Modern host build failed" }
 
+      - name: Verify T+ source integration
+        shell: pwsh
+        run: |
+          python scripts/generate_stroke_filter_data.py --check
+          python scripts/verify_tplus.py work/release-build/decoded
+          python scripts/verify_stroke_filter.py work/release-build/decoded
+
       - name: Run Compose state and contract tests
         shell: pwsh
         run: |
           $env:GRADLE_USER_HOME = "$env:GITHUB_WORKSPACE\work\modern-settings-gradle-home"
+          $env:ANDROID_USER_HOME = "$env:GITHUB_WORKSPACE\work\android-user-home"
           ./modern-settings/gradlew.bat -p modern-settings :compose-runtime:testDebugUnitTest
+
+      - name: Prepare pinned AndroidX Autofill verifier dependency
+        shell: pwsh
+        run: python scripts/prepare_androidx_autofill_dependency.py
 
       - name: Verify Chinese copywriting
         shell: pwsh
@@ -228,6 +240,8 @@ jobs:
           python scripts/verify_target34.py work/final-decoded
           python scripts/verify_target35.py work/final-decoded
           python scripts/verify_target36.py work/final-decoded
+          python scripts/verify_tplus.py work/final-decoded
+          python scripts/verify_stroke_filter.py work/final-decoded
           python scripts/verify_universal_keyboard_header.py work/final-decoded
           python scripts/verify_simplified_traditional_header_toggle.py work/final-decoded
           python scripts/verify_candidate_frame_rate.py work/final-decoded
@@ -339,7 +353,7 @@ jobs:
           retention-days: 30
 
       - name: Publish GitHub Release for matching version tag
-        if: startsWith(github.ref, 'refs/tags/v')
+        if: startsWith(github.ref, 'refs/tags/tplus-v')
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
@@ -370,10 +384,10 @@ jobs:
             throw "Release $env:TAG_NAME already exists; published releases and assets are immutable"
           } else {
             gh release create $env:TAG_NAME `
-              "$env:APK_PATH#$env:RELEASE_APK_NAME" `
-              "$env:APK_PATH.sha256#$env:RELEASE_APK_NAME.sha256" `
+              "$env:APK_PATH" `
+              "$env:APK_PATH.sha256" `
               --repo $env:GITHUB_REPOSITORY --verify-tag `
-              --title "v$env:EXPECTED_VERSION_NAME - $env:EXPECTED_RELEASE_TITLE" `
+              --title "T+ v$env:EXPECTED_VERSION_NAME - $env:EXPECTED_RELEASE_TITLE" `
               --notes-file release-notes.md
           }
 

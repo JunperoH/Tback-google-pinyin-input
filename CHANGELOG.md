@@ -2,6 +2,34 @@
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-09-01
+
+本版本以正式上游 `v2.0.10` 为新基线，保留 T+ 双字母布局、自动笔画过滤、主题化轨迹和 L/M 长按修复，并把 T+ 接入 target SDK 36、Compose Material 3 设置、统一 Header、Inline Autofill、简繁切换和 Android 15/16 稳定性修复。
+
+### Added
+
+- T+ 布局加入上游原生「简/繁」Header 快捷键与显示设置，继续复用 Google 拼音的转换状态和 Candidate 刷新链路。
+- GitHub Actions 同时执行上游 Compose/Header/API 36 门禁与 T+、Stroke Filter 专项验证，并从 `version.properties` 读取唯一发布身份。
+
+### Fixed
+
+- 保留 `8d4f8ca` 的 L/M 长按候选分隔修复，避免将 `0 l L` 等候选标签整串提交。
+- 合入上游 `v2.0.8–v2.0.10` 的电话键盘类链接、拼音组合文本高度、未测量键盘切换、密码输入框高度和区域外松手分页修复。
+
+### Changed
+
+- Android `versionName` 更新为 `2.1.0`，`versionCode` 递增为 `4520407`，target SDK 从 28 提升到 36；Application ID 与 T+ 正式签名身份保持不变。
+- 正式 APK 命名为 `ComebackGooglePinyinInput-TPlus-arm64-v8a-2.1.0.apk`，发布标签使用 `tplus-v2.1.0`，已发布的 `tplus-v1.1.0` 保持不可变。
+- Android 15/API 35 及以上使用 Compose Material 3 设置，低版本继续使用旧 Preference 设置。
+- T+ 候选 Header 继承统一 Candidate、Clipboard 与 Inline Autofill 仲裁；笔画按钮继续只在有效 T+ composing 会话中出现。
+
+### Testing
+
+- 从固定原始 APK 完成 Compose Host 全量构建。最终 APK 的 6,633 个旧资源 ID、target SDK 36、`arm64-v8a`、v1/v2/v3 签名和 16 KiB ZIP alignment 均通过门禁，两次独立补丁生成的 5,742 个文件完全一致。
+- 在 4 KB/API 34 与 4 KB/API 36 模拟器把同证书的 T+ 1.1.0 原位覆盖到 2.1.0，`firstInstallTime`、T+ 布局选择和笔画过滤设置均保留。
+- API 34 旧 Preference 与 API 36 Compose Material 3 都显示并持久化「拼音笔画过滤」。L 长按显示独立 `L`、`l`、`0` 候选，松手只提交一个字符，在过滤开启时结果相同。
+- 两台模拟器均确认 T+ 普通点按产生原生拼音候选，跨键横划显示主题色轨迹并过滤为横起笔候选。API 36 符号页横向分页正常，相关进程日志无崩溃、ANR 或类加载错误。
+
 ## [2.0.10] - 2026-08-19
 
 本版本修复键盘切换期间的两处稳定性与窗口高度问题，并修复标点、符号和 Emoji 分页手势移出区域后回弹的问题。输入、Candidate、学习、词典、手写识别和既有分页目标语义保持不变。
@@ -226,7 +254,56 @@ Android 16 大版本正式基线。已验收的 target SDK 29–36 分支合并�
 - target 35 V1 真机确认首次引导页脚和 IME 底行被三键导航栏遮挡。V2 保持 edge-to-edge 开启，仅为 first-run footer/pager 与 InputView 应用 bottom inset，并用原键盘背景绘制 IME inset 区域。
 - V2 复测发现 broad system-window bottom inset 在 IME 窗口产生过大黑区且最高键盘仍可被遮挡。V3 改为只读取 `WindowInsets.Type.navigationBars()`，避免混入其他 inset source。
 - V3 在键盘高度调整引发的系统栏可见性过渡中会收到临时 bottom=0。V4 改用 `getInsetsIgnoringVisibility(Type.navigationBars())` 保持设备动态导航栏高度稳定，不写死像素值。
+## [1.1.0] - 2026-08-02
 
+### Added
+
+- 14 个 T+ 字母键的长按菜单按「数字/符号、小写、大写」顺序提供完整多候选，同时保留原角标与左右短滑行为。
+- 新增默认关闭的「拼音笔画过滤」设置和候选栏显式「笔」入口；捕获态把键盘轨迹分类为横、竖、撇、点/捺、折，最多记录五笔。
+- 试做自动笔画旁观：候选出现后无需先点「笔」，越过系统 touch slop 才中途认领；普通点按和静止长按继续由 Basic 处理。
+- 新增使用当前主题手势颜色的圆角平滑轨迹，抬手后淡出；绘制层不接收触摸、不调用滑行解码。
+- 固定并编译 Conway 笔顺数据为小端 `TSF1` 资源，附来源、CC BY 4.0 许可证、生成器与损坏数据拒绝测试。
+- 新增可重放的 HMM 候选过滤会话，保留 Google 原 `Candidate` payload，按 256 个候选分批扫描，并以 composing/filter 双世代取消过期任务。
+
+### Fixed
+
+- 修复 composing 建立后旧 `BasicMotionEventHandler` target 持续抢占下一段触摸的问题；自动捕获只在新 `ACTION_DOWN` 释放旧 target，随后让 Stroke 与 Basic 共同旁观。
+- `BasicMotionEventHandler` 保持原实现；未越过 touch slop 的点按和静止长按不被笔画处理器独占。
+- 当前布局为 T+ 且设置开启时关闭两条 Google 拼音跨键滑行处理链；较长键内左右滑在自动模式下会优先判为横笔。
+- 空格、回车/搜索软键和候选点击统一提交当前过滤结果的全局首个原候选；软 IME action 在 T9 原映射前拦截，避免提交隐藏的原首选或拼音原文。
+- 数据加载失败、缓存上限、世代失效与过滤异常均 fail-open，按缓存加剩余迭代器恢复原候选顺序，不影响 QWERTY、九键和独立笔画布局。
+
+### Changed
+
+- Android `versionName` 保持 `1.1.0`，本轮试做 `versionCode` 递增为 `4520406`；所有旧 APK 均以独立文件名保留。
+- 新增笔画过滤静态校验、可重复数据生成与独立干净解码树比较流程。
+- 设置摘要说明候选出现后可直接书写笔画，且开启时关闭 T+ 跨键滑行。
+
+### Testing
+
+- 在 4 KB/API34 模拟器覆盖安装 `versionCode 4520406`：自动激活后普通点按继续更新 composing，静止长按仍显示原多候选 popup，横划期间显示主题色轨迹并在抬手后得到首笔横过滤候选；设备 APK 与 dist SHA-256 一致，无 ART/Verify 错误。
+
+## [1.0.0] - 2026-08-02
+
+### Added
+
+- T+ 键盘接入 Google 拼音原生手势轨迹与 HMM 解码；同一双字母键以共享几何区域向手势引擎发布两个字母。
+- 保留短距离左右滑动选择单字母，跨键移动超过原生阈值后进入连续滑行输入。
+- 新增「拼音 T+ 双字母键盘」，与全键盘、九键、笔画和手写布局并列显示。
+- 按触宝 T+ 的 QWERTY 空间顺序重建 `QW/ER/TY/UI/OP`、`AS/DF/GH/JK/L-`、`ZX/CV/BN/M'` 键位。
+- 将一次双字母按键展开为两个等权 `KeyData`，复用原 Google 拼音 T9 HMM 解码、候选、用户词典和上下文预测管线。
+- 支持左右滑动明确选择单个字母，以及长按输入键面数字或符号。
+
+### Fixed
+
+- 为 T+ 数字和标点长按动作补齐框架要求的 keycode，使右上角副字符能正常弹出选择气泡并提交。
+
+### Changed
+
+- 将当前完整功能集重新编号为本 fork 的首个正式版本 `1.0.0`；Android `versionCode` 保持单调递增，以便覆盖安装此前测试版。
+- T+ 默认包名改为 `com.google.android.inputmethod.pinyin.compat.tplus`，可与上游兼容版并存。
+- 记录触宝 5.7.9.0 APK 的 SHA-256、公开参考资料、独立重建边界和验证状态；不分发触宝 APK 或资源。
+- 新增 T+ 静态校验脚本，并将键位覆盖、IME 注册和解码器注入检查接入 GitHub Actions。
 ## [1.0.3] - 2026-08-01
 
 ### Fixed

@@ -20,8 +20,6 @@ def run(command: list[str], *, env: dict[str, str] | None = None) -> None:
 
 
 def executable(path: Path, arguments: list[str]) -> list[str]:
-    if os.name == "nt" and path.suffix.lower() in (".bat", ".cmd"):
-        return ["cmd.exe", "/d", "/c", str(path), *arguments]
     return [str(path), *arguments]
 
 
@@ -31,8 +29,8 @@ def main() -> int:
     parser.add_argument("--work", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--application-id", required=True)
-    parser.add_argument("--version-name", default="2.0.2")
-    parser.add_argument("--version-code", type=int, default=4520387)
+    parser.add_argument("--version-name", default="2.1.0")
+    parser.add_argument("--version-code", type=int, default=4520407)
     parser.add_argument("--apktool", type=Path, required=True)
     parser.add_argument("--apktool-framework", type=Path, required=True)
     parser.add_argument("--gradle", type=Path, required=True)
@@ -62,7 +60,7 @@ def main() -> int:
     )
     args = parser.parse_args()
 
-    formal_application_id = "com.google.android.inputmethod.pinyin.compat"
+    formal_application_id = "com.google.android.inputmethod.pinyin.compat.tplus"
     if args.debuggable and args.application_id == formal_application_id:
         raise RuntimeError("Debug mode is forbidden for the formal application ID")
     if args.launcher_label and args.application_id == formal_application_id:
@@ -141,11 +139,18 @@ def main() -> int:
 
     gradle_home = ROOT / "work/modern-settings-gradle-home"
     gradle_home.mkdir(parents=True, exist_ok=True)
+    android_user_home = ROOT / "work/android-user-home"
+    android_user_home.mkdir(parents=True, exist_ok=True)
+    build_temp = ROOT / "work/build-temp"
+    build_temp.mkdir(parents=True, exist_ok=True)
     env = os.environ.copy()
     env["JAVA_HOME"] = str(args.jdk.resolve())
     env["ANDROID_HOME"] = str(args.sdk.resolve())
     env["ANDROID_SDK_ROOT"] = str(args.sdk.resolve())
+    env["ANDROID_USER_HOME"] = str(android_user_home.resolve())
     env["GRADLE_USER_HOME"] = str(gradle_home.resolve())
+    env["TEMP"] = str(build_temp.resolve())
+    env["TMP"] = str(build_temp.resolve())
     variant = "debug" if args.debuggable else "release"
     gradle_task = "assembleDebug" if args.debuggable else "assembleRelease"
     gradle_args = [
@@ -185,9 +190,32 @@ def main() -> int:
         ]
     )
 
-    build_tools = args.sdk.resolve() / "build-tools/36.0.0"
-    zipalign = build_tools / ("zipalign.exe" if os.name == "nt" else "zipalign")
-    apksigner = build_tools / ("apksigner.bat" if os.name == "nt" else "apksigner")
+    build_tools_root = args.sdk.resolve() / "build-tools"
+    build_tools_candidates = [build_tools_root / "36.0.0"] + sorted(
+        (
+            path
+            for path in build_tools_root.glob("36.*")
+            if path.name != "36.0.0"
+        ),
+        reverse=True,
+    )
+    executable_names = (
+        "zipalign.exe" if os.name == "nt" else "zipalign",
+        "apksigner.bat" if os.name == "nt" else "apksigner",
+    )
+    build_tools = next(
+        (
+            path
+            for path in build_tools_candidates
+            if all((path / name).is_file() for name in executable_names)
+        ),
+        None,
+    )
+    if build_tools is None:
+        raise FileNotFoundError("Android Build Tools 36.x with zipalign and apksigner")
+    print(f"Using Android Build Tools {build_tools.name}")
+    zipalign = build_tools / executable_names[0]
+    apksigner = build_tools / executable_names[1]
     run([str(zipalign), "-P", "16", "-f", "4", str(unaligned), str(aligned)])
 
     args.output.resolve().parent.mkdir(parents=True, exist_ok=True)

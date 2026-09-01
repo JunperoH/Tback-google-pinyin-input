@@ -198,4 +198,6 @@
     <string name="modern_settings_milliseconds_format">%1$d ms</string>
     <string name="modern_settings_value_read_only">%1$s，%2$s，只读</string>
     <string name="modern_settings_value_adjustable">%1$s，%2$s，可调整</string>
+    <string name="modern_settings_tplus_stroke_filter_title">拼音笔画过滤</string>
+    <string name="modern_settings_tplus_stroke_filter_summary">在 T+ 拼音中开启后会关闭滑行输入；候选出现后可直接在键盘书写最多五笔筛选原候选</string>
 </resources>

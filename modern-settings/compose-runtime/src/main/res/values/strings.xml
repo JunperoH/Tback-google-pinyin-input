@@ -201,4 +201,6 @@
     <string name="modern_settings_milliseconds_format">%1$d ms</string>
     <string name="modern_settings_value_read_only">%1$s, %2$s, read only</string>
     <string name="modern_settings_value_adjustable">%1$s, %2$s, adjustable</string>
+    <string name="modern_settings_tplus_stroke_filter_title">Pinyin stroke filter</string>
+    <string name="modern_settings_tplus_stroke_filter_summary">On T+, this turns off glide typing; after candidates appear, draw up to five strokes directly on the keyboard</string>
 </resources>

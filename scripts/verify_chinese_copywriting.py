@@ -47,6 +47,14 @@ TEXT_EXTENSIONS = {
     ".properties",
 }
 
+# These two files are preserved research/execution records rather than current
+# product copy. Their quoted observations and source excerpts are intentionally
+# not normalized by the release-copy typography gate.
+TYPOGRAPHY_EXCLUSIONS = {
+    "docs/tplus-stroke-filter-execution-plan.md",
+    "docs/tplus-stroke-filter-research.md",
+}
+
 
 def tracked_files() -> list[Path]:
     output = subprocess.check_output(
@@ -87,7 +95,12 @@ def main() -> int:
     checked = 0
 
     for path in tracked_files():
-        if path.suffix not in TEXT_EXTENSIONS or not path.is_file():
+        relative = path.relative_to(ROOT).as_posix()
+        if (
+            relative in TYPOGRAPHY_EXCLUSIONS
+            or path.suffix not in TEXT_EXTENSIONS
+            or not path.is_file()
+        ):
             continue
         try:
             lines = path.read_text(encoding="utf-8").splitlines()

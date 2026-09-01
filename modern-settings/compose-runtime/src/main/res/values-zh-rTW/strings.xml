@@ -2,4 +2,6 @@
 <resources>
     <string name="modern_settings_show_simplified_traditional_header_toggle_title">顯示簡繁切換按鈕</string>
     <string name="modern_settings_show_simplified_traditional_header_toggle_summary">在語音輸入或收合鍵左側顯示快速切換按鈕</string>
+    <string name="modern_settings_tplus_stroke_filter_title">拼音筆畫篩選</string>
+    <string name="modern_settings_tplus_stroke_filter_summary">在 T+ 拼音中開啟後會關閉滑行輸入；候選出現後可直接在鍵盤書寫最多五筆篩選原候選</string>
 </resources>

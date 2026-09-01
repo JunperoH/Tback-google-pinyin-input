@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tplus_stroke_filter_preference_key" translatable="false">tplus_stroke_filter_enabled</string>
+    <string name="stroke_filter_setting_title">Pinyin stroke filter</string>
+    <string name="stroke_filter_setting_summary">On T+, this turns off glide typing; after candidates appear, draw up to five strokes directly on the keyboard</string>
+    <string name="stroke_filter_toggle_label" translatable="false">笔</string>
+    <string name="stroke_filter_toggle_content_description">Pause or resume automatic Pinyin stroke capture</string>
+    <string name="stroke_filter_capturing">Draw</string>
+    <string name="stroke_filter_scanning">Filtering…</string>
+    <string name="stroke_filter_no_match">No match</string>
+</resources>

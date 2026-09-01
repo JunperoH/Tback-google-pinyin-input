@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="stroke_filter_setting_title">拼音笔画过滤</string>
+    <string name="stroke_filter_setting_summary">在 T+ 拼音中开启后会关闭滑行输入；候选出现后可直接在键盘书写最多五笔筛选原候选</string>
+    <string name="stroke_filter_toggle_label">笔</string>
+    <string name="stroke_filter_toggle_content_description">暂停或恢复自动拼音笔画捕获</string>
+    <string name="stroke_filter_capturing">笔·画</string>
+    <string name="stroke_filter_scanning">筛选……</string>
+    <string name="stroke_filter_no_match">无匹配</string>
+</resources>

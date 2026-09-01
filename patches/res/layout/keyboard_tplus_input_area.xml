@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout style="@style/InputArea.Qwerty"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <LinearLayout style="@style/KeyboardRow">
+        <com.google.android.apps.inputmethod.libs.framework.keyboard.SoftKeyView android:id="@id/key_pos_tplus_qw" android:layout_weight="200.0" style="@style/SoftKey.BigInset" />
+        <com.google.android.apps.inputmethod.libs.framework.keyboard.SoftKeyView android:id="@id/key_pos_tplus_er" android:layout_weight="200.0" style="@style/SoftKey.BigInset" />
+        <com.google.android.apps.inputmethod.libs.framework.keyboard.SoftKeyView android:id="@id/key_pos_tplus_ty" android:layout_weight="200.0" style="@style/SoftKey.BigInset" />
+        <com.google.android.apps.inputmethod.libs.framework.keyboard.SoftKeyView android:id="@id/key_pos_tplus_ui" android:layout_weight="200.0" style="@style/SoftKey.BigInset" />
+        <com.google.android.apps.inputmethod.libs.framework.keyboard.SoftKeyView android:id="@id/key_pos_tplus_op" android:layout_weight="200.0" style="@style/SoftKey.BigInset" />
+    </LinearLayout>
+    <LinearLayout style="@style/KeyboardRow">
+        <com.google.android.apps.inputmethod.libs.framework.keyboard.SoftKeyView android:id="@id/key_pos_tplus_as" android:layout_weight="200.0" style="@style/SoftKey.BigInset" />
+        <com.google.android.apps.inputmethod.libs.framework.keyboard.SoftKeyView android:id="@id/key_pos_tplus_df" android:layout_weight="200.0" style="@style/SoftKey.BigInset" />
+        <com.google.android.apps.inputmethod.libs.framework.keyboard.SoftKeyView android:id="@id/key_pos_tplus_gh" android:layout_weight="200.0" style="@style/SoftKey.BigInset" />
+        <com.google.android.apps.inputmethod.libs.framework.keyboard.SoftKeyView android:id="@id/key_pos_tplus_jk" android:layout_weight="200.0" style="@style/SoftKey.BigInset" />
+        <com.google.android.apps.inputmethod.libs.framework.keyboard.SoftKeyView android:id="@id/key_pos_tplus_l" android:layout_weight="200.0" style="@style/SoftKey.BigInset" />
+    </LinearLayout>
+    <LinearLayout style="@style/KeyboardRow">
+        <com.google.android.apps.inputmethod.libs.framework.keyboard.SoftKeyView android:id="@id/key_pos_shift" android:layout_weight="100.0" style="@style/SoftKey.BigInset.Dark" />
+        <com.google.android.apps.inputmethod.libs.framework.keyboard.SoftKeyView android:id="@id/key_pos_tplus_zx" android:layout_weight="200.0" style="@style/SoftKey.BigInset" />
+        <com.google.android.apps.inputmethod.libs.framework.keyboard.SoftKeyView android:id="@id/key_pos_tplus_cv" android:layout_weight="200.0" style="@style/SoftKey.BigInset" />
+        <com.google.android.apps.inputmethod.libs.framework.keyboard.SoftKeyView android:id="@id/key_pos_tplus_bn" android:layout_weight="200.0" style="@style/SoftKey.BigInset" />
+        <com.google.android.apps.inputmethod.libs.framework.keyboard.SoftKeyView android:id="@id/key_pos_tplus_m" android:layout_weight="150.0" style="@style/SoftKey.BigInset" />
+        <com.google.android.apps.inputmethod.libs.framework.keyboard.SoftKeyView android:id="@id/key_pos_del" android:layout_weight="150.0" style="@style/SoftKey.BigInset.Dark" />
+    </LinearLayout>
+</LinearLayout>

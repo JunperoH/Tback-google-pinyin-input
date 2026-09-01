@@ -143,6 +143,22 @@ internal fun androidx.compose.foundation.lazy.LazyListScope.chineseInputSettings
     item {
         SettingsSwitchRow(
             title = legacyString(
+                "stroke_filter_setting_title",
+                R.string.modern_settings_tplus_stroke_filter_title,
+            ),
+            supporting = legacyString(
+                "stroke_filter_setting_summary",
+                R.string.modern_settings_tplus_stroke_filter_summary,
+            ),
+            checked = snapshot.tplusStrokeFilter.value,
+            onCheckedChange = {
+                actions.onBooleanChange(BooleanSettingContracts.tplusStrokeFilter, it)
+            },
+        )
+    }
+    item {
+        SettingsSwitchRow(
+            title = legacyString(
                 "setting_chinese_english_mixed_input_title",
                 R.string.modern_settings_chinese_english_title,
             ),

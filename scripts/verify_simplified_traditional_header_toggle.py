@@ -12,6 +12,7 @@ CHINESE_KEYBOARDS = (
     "keyboard_zh_cn_pinyin_qwerty.xml",
     "keyboard_zh_cn_pinyin_9key.xml",
     "keyboard_zh_cn_stroke.xml",
+    "keyboard_zh_cn_pinyin_tplus.xml",
 )
 
 

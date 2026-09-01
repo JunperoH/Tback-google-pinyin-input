@@ -164,20 +164,11 @@ def main() -> int:
                 "-bootclasspath", str(android_jar),
                 "-d", str(classes),
                 str(SOURCE),
-            ],
-            check=True,
-        )
-        classpath = f"{classes};{android_jar}"
-        subprocess.run(
-            [
-                str(javac),
-                "-encoding", "UTF-8",
-                "-cp", classpath,
-                "-d", str(classes),
                 str(harness),
             ],
             check=True,
         )
+        classpath = f"{classes};{android_jar}"
         subprocess.run(
             [str(java), "-cp", classpath, "SensitiveClipboardCompatHostTest"],
             check=True,
