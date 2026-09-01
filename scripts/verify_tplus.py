@@ -44,11 +44,39 @@ def verify_xml_syntax() -> None:
 
 def verify_softkeys() -> None:
     root = parse(RES / "xml" / "softkeys_input_zh_cn_pinyin_tplus.xml")
-    lists = root.findall("./softkeys/softkey_list")
-    require(len(lists) == 2, "Expected lowercase and uppercase T+ pair lists")
+    all_lists = root.findall("./softkeys/softkey_list")
+    template_ids = (
+        "@id/softkey_template_tplus_pair",
+        "@id/softkey_template_tplus_pair_upper",
+    )
+    definition_lists = [
+        container
+        for container in all_lists
+        if container.find("softkey_template") is not None
+    ]
+    require(
+        len(definition_lists) == 2,
+        "T+ multi-candidate templates must be nested in splitter lists",
+    )
+    for container, template_id in zip(definition_lists, template_ids, strict=True):
+        require(
+            container.get("splitter") == " ",
+            f"T+ popup template {template_id} must split candidates on spaces",
+        )
+        template = container.find(f"softkey_template[@id='{template_id}']")
+        require(template is not None, f"Missing T+ popup template {template_id}")
+
+    lists = [
+        root.find(f"./softkeys/softkey_list[@template_id='{template_id}']")
+        for template_id in template_ids
+    ]
+    require(all(container is not None for container in lists), "Missing T+ pair lists")
 
     for index, expected_upper in enumerate((False, True)):
-        keys = lists[index].findall("softkey")
+        container = lists[index]
+        assert container is not None
+        require(container.get("splitter") == " ", "T+ pair list must split on spaces")
+        keys = container.findall("softkey")
         require(len(keys) == len(EXPECTED_PAIRS), "Unexpected T+ pair count")
         for key, expected_pair, alternate in zip(
             keys, EXPECTED_PAIRS, PAIR_ALTERNATES, strict=True
@@ -68,8 +96,9 @@ def verify_softkeys() -> None:
             require(key.get("alternate_data") == alternate, f"Wrong corner label for {pair}")
             require(key.get("long_press_data") == expected_popup, f"Wrong long-press menu for {pair}")
 
-    templates = root.findall("./softkeys/softkey_template")
+    templates = [container.find("softkey_template") for container in definition_lists]
     for template in templates:
+        assert template is not None
         long_press = template.find("action[@type='LONG_PRESS']")
         require(long_press is not None, "T+ pair template lacks long press")
         require(long_press.get("data") == "$long_press_data$", "T+ pair popup does not use its menu data")
@@ -80,9 +109,24 @@ def verify_softkeys() -> None:
             "T+ pair popup must use the multi-candidate rectangular layout",
         )
 
+    single_ids = {
+        "@id/softkey_tplus_l",
+        "@id/softkey_tplus_m",
+        "@id/softkey_tplus_up_l",
+        "@id/softkey_tplus_up_m",
+    }
+    single_lists = [
+        container
+        for container in all_lists
+        if any(key.get("id") in single_ids for key in container.findall("softkey"))
+    ]
+    require(
+        len(single_lists) == 1 and single_lists[0].get("splitter") == " ",
+        "T+ L/M multi-candidate keys must be nested in a space splitter list",
+    )
     single_keys = {
         key.get("id"): key
-        for key in root.findall("./softkeys/softkey")
+        for key in single_lists[0].findall("softkey")
     }
     for suffix, letter, punctuation, popup in (
         ("l", "l", "-", "0 l L"),

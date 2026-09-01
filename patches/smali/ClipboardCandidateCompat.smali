@@ -23,6 +23,10 @@
 
 .field private static injected:Z
 
+.field private static candidateSensitive:Z
+
+.field private static candidatePayload:Ljava/lang/String;
+
 
 # instance fields
 .field private final service:Lcom/google/android/apps/inputmethod/libs/framework/core/GoogleInputMethodService;
@@ -30,6 +34,8 @@
 .field private final clipboard:Landroid/content/ClipboardManager;
 
 .field private final handler:Landroid/os/Handler;
+
+.field private final maskForEditor:Z
 
 .field private pendingCandidateReset:Z
 
@@ -39,7 +45,7 @@
 
 
 # direct methods
-.method private constructor <init>(Lcom/google/android/apps/inputmethod/libs/framework/core/GoogleInputMethodService;Landroid/content/ClipboardManager;)V
+.method private constructor <init>(Lcom/google/android/apps/inputmethod/libs/framework/core/GoogleInputMethodService;Landroid/content/ClipboardManager;Z)V
     .locals 1
 
     invoke-direct {p0}, Ljava/lang/Object;-><init>()V
@@ -47,6 +53,8 @@
     iput-object p1, p0, Lcom/google/android/apps/inputmethod/libs/framework/core/ClipboardCandidateCompat;->service:Lcom/google/android/apps/inputmethod/libs/framework/core/GoogleInputMethodService;
 
     iput-object p2, p0, Lcom/google/android/apps/inputmethod/libs/framework/core/ClipboardCandidateCompat;->clipboard:Landroid/content/ClipboardManager;
+
+    iput-boolean p3, p0, Lcom/google/android/apps/inputmethod/libs/framework/core/ClipboardCandidateCompat;->maskForEditor:Z
 
     new-instance v0, Landroid/os/Handler;
 
@@ -58,7 +66,7 @@
 .end method
 
 .method private static isEditorAllowed(Landroid/view/inputmethod/EditorInfo;)Z
-    .locals 5
+    .locals 3
 
     const/4 v0, 0x0
 
@@ -66,7 +74,7 @@
 
     iget-object v1, p0, Landroid/view/inputmethod/EditorInfo;->privateImeOptions:Ljava/lang/String;
 
-    if-eqz v1, :check_type
+    if-eqz v1, :allowed
 
     const-string v2, "disableAutoPaste"
 
@@ -76,90 +84,27 @@
 
     if-nez v1, :blocked
 
-    :check_type
-    iget v1, p0, Landroid/view/inputmethod/EditorInfo;->inputType:I
-
-    and-int/lit8 v2, v1, 0xf
-
-    const/4 v3, 0x1
-
-    if-ne v2, v3, :check_number
-
-    and-int/lit16 v1, v1, 0xff0
-
-    const/16 v2, 0x80
-
-    if-eq v1, v2, :blocked
-
-    const/16 v2, 0x90
-
-    if-eq v1, v2, :blocked
-
-    const/16 v2, 0xe0
-
-    if-eq v1, v2, :blocked
-
-    return v3
-
-    :check_number
-    const/4 v4, 0x2
-
-    if-ne v2, v4, :allowed
-
-    and-int/lit16 v1, v1, 0xff0
-
-    const/16 v2, 0x10
-
-    if-ne v1, v2, :allowed
-
-    return v0
-
     :allowed
-    return v3
+    const/4 v0, 0x1
 
     :blocked
     return v0
 .end method
 
 .method private static isSensitive(Landroid/content/ClipDescription;)Z
-    .locals 3
+    .locals 1
 
-    const/4 v0, 0x0
-
-    if-eqz p0, :done
-
-    invoke-virtual {p0}, Landroid/content/ClipDescription;->getExtras()Landroid/os/PersistableBundle;
-
-    move-result-object v1
-
-    if-eqz v1, :done
-
-    const-string v2, "android.content.extra.IS_SENSITIVE"
-
-    invoke-virtual {v1, v2, v0}, Landroid/os/PersistableBundle;->getBoolean(Ljava/lang/String;Z)Z
+    invoke-static {p0}, Lcom/google/android/inputmethod/pinyin/SensitiveClipboardCompat;->isSourceSensitive(Landroid/content/ClipDescription;)Z
 
     move-result v0
 
-    :done
     return v0
 .end method
 
 .method private static makeKey(Ljava/lang/String;J)Ljava/lang/String;
-    .locals 2
+    .locals 1
 
-    new-instance v0, Ljava/lang/StringBuilder;
-
-    invoke-direct {v0}, Ljava/lang/StringBuilder;-><init>()V
-
-    invoke-virtual {v0, p0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-
-    const/16 v1, 0x1f
-
-    invoke-virtual {v0, v1}, Ljava/lang/StringBuilder;->append(C)Ljava/lang/StringBuilder;
-
-    invoke-virtual {v0, p1, p2}, Ljava/lang/StringBuilder;->append(J)Ljava/lang/StringBuilder;
-
-    invoke-virtual {v0}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+    invoke-static {p0, p1, p2}, Lcom/google/android/inputmethod/pinyin/SensitiveClipboardCompat;->makeOpaqueKey(Ljava/lang/String;J)Ljava/lang/String;
 
     move-result-object v0
 
@@ -169,15 +114,26 @@
 .method private static makeCandidate(Ljava/lang/String;)Lcom/google/android/apps/inputmethod/libs/framework/core/Candidate;
     .locals 6
 
-    # The clipboard candidate is a faithful paste operation. Its normalized
-    # visible label is ellipsized by the measured View; payload stays complete.
+    # Display and accessibility are derived independently from the complete
+    # click payload. Sensitive plaintext is never attached to a visible label
+    # or content description.
     move-object v0, p0
 
     move-object v1, p0
 
-    # Keep the complete normalized label and let TextView ellipsize against its
-    # measured clipboard slot. Character-count truncation can cross the actual
-    # right divider on narrow screens and with wide glyphs.
+    sget-boolean v5, Lcom/google/android/apps/inputmethod/libs/framework/core/ClipboardCandidateCompat;->candidateSensitive:Z
+
+    if-eqz v5, :normalize_visible
+
+    invoke-static {v1}, Lcom/google/android/inputmethod/pinyin/SensitiveClipboardCompat;->mask(Ljava/lang/String;)Ljava/lang/String;
+
+    move-result-object v1
+
+    goto :visible_ready
+
+    :normalize_visible
+    # Keep the complete normalized ordinary label and let TextView ellipsize
+    # against its measured clipboard slot.
     const-string v2, "[\\r\\n\\t]+"
 
     const-string v3, " "
@@ -186,12 +142,20 @@
 
     move-result-object v1
 
+    :visible_ready
     new-instance v2, Lcom/google/android/apps/inputmethod/libs/framework/core/Candidate$a;
 
     invoke-direct {v2}, Lcom/google/android/apps/inputmethod/libs/framework/core/Candidate$a;-><init>()V
 
     iput-object v1, v2, Lcom/google/android/apps/inputmethod/libs/framework/core/Candidate$a;->a:Ljava/lang/CharSequence;
 
+    if-eqz v5, :ordinary_accessibility
+
+    const-string v3, "粘贴敏感剪贴板内容"
+
+    goto :accessibility_ready
+
+    :ordinary_accessibility
     new-instance v3, Ljava/lang/StringBuilder;
 
     invoke-direct {v3}, Ljava/lang/StringBuilder;-><init>()V
@@ -204,10 +168,22 @@
 
     invoke-virtual {v3}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
 
-    move-result-object v1
+    move-result-object v3
 
-    iput-object v1, v2, Lcom/google/android/apps/inputmethod/libs/framework/core/Candidate$a;->a:Ljava/lang/String;
+    :accessibility_ready
+    iput-object v3, v2, Lcom/google/android/apps/inputmethod/libs/framework/core/Candidate$a;->a:Ljava/lang/String;
 
+    if-eqz v5, :ordinary_payload
+
+    # Keep sensitive plaintext only in the short-lived process-local payload;
+    # never attach it to the Candidate object recycled through keyboard Views.
+    sput-object v0, Lcom/google/android/apps/inputmethod/libs/framework/core/ClipboardCandidateCompat;->candidatePayload:Ljava/lang/String;
+
+    const-string v0, "compat_clipboard:sensitive"
+
+    goto :payload_ready
+
+    :ordinary_payload
     new-instance v1, Ljava/lang/StringBuilder;
 
     invoke-direct {v1}, Ljava/lang/StringBuilder;-><init>()V
@@ -222,6 +198,7 @@
 
     move-result-object v0
 
+    :payload_ready
     iput-object v0, v2, Lcom/google/android/apps/inputmethod/libs/framework/core/Candidate$a;->a:Ljava/lang/Object;
 
     invoke-virtual {v2}, Lcom/google/android/apps/inputmethod/libs/framework/core/Candidate$a;->a()Lcom/google/android/apps/inputmethod/libs/framework/core/Candidate;
@@ -252,9 +229,13 @@
 
     if-eqz v0, :done
 
+    invoke-static {p1}, Lcom/google/android/inputmethod/pinyin/SensitiveClipboardCompat;->isPasswordEditor(Landroid/view/inputmethod/EditorInfo;)Z
+
+    move-result v2
+
     new-instance v1, Lcom/google/android/apps/inputmethod/libs/framework/core/ClipboardCandidateCompat;
 
-    invoke-direct {v1, p0, v0}, Lcom/google/android/apps/inputmethod/libs/framework/core/ClipboardCandidateCompat;-><init>(Lcom/google/android/apps/inputmethod/libs/framework/core/GoogleInputMethodService;Landroid/content/ClipboardManager;)V
+    invoke-direct {v1, p0, v0, v2}, Lcom/google/android/apps/inputmethod/libs/framework/core/ClipboardCandidateCompat;-><init>(Lcom/google/android/apps/inputmethod/libs/framework/core/GoogleInputMethodService;Landroid/content/ClipboardManager;Z)V
 
     sput-object v1, Lcom/google/android/apps/inputmethod/libs/framework/core/ClipboardCandidateCompat;->current:Lcom/google/android/apps/inputmethod/libs/framework/core/ClipboardCandidateCompat;
 
@@ -304,9 +285,13 @@
 
     sput-object v0, Lcom/google/android/apps/inputmethod/libs/framework/core/ClipboardCandidateCompat;->candidateKey:Ljava/lang/String;
 
+    sput-object v0, Lcom/google/android/apps/inputmethod/libs/framework/core/ClipboardCandidateCompat;->candidatePayload:Ljava/lang/String;
+
     const/4 v0, 0x0
 
     sput-boolean v0, Lcom/google/android/apps/inputmethod/libs/framework/core/ClipboardCandidateCompat;->injected:Z
+
+    sput-boolean v0, Lcom/google/android/apps/inputmethod/libs/framework/core/ClipboardCandidateCompat;->candidateSensitive:Z
 
     :done
     return-void
@@ -321,9 +306,13 @@
 
     sput-object v0, Lcom/google/android/apps/inputmethod/libs/framework/core/ClipboardCandidateCompat;->candidateKey:Ljava/lang/String;
 
+    sput-object v0, Lcom/google/android/apps/inputmethod/libs/framework/core/ClipboardCandidateCompat;->candidatePayload:Ljava/lang/String;
+
     const/4 v1, 0x0
 
     sput-boolean v1, Lcom/google/android/apps/inputmethod/libs/framework/core/ClipboardCandidateCompat;->injected:Z
+
+    sput-boolean v1, Lcom/google/android/apps/inputmethod/libs/framework/core/ClipboardCandidateCompat;->candidateSensitive:Z
 
     iget-object v2, p0, Lcom/google/android/apps/inputmethod/libs/framework/core/ClipboardCandidateCompat;->clipboard:Landroid/content/ClipboardManager;
 
@@ -347,7 +336,11 @@
 
     move-result v4
 
-    if-nez v4, :done
+    iget-boolean v6, p0, Lcom/google/android/apps/inputmethod/libs/framework/core/ClipboardCandidateCompat;->maskForEditor:Z
+
+    or-int/2addr v4, v6
+
+    sput-boolean v4, Lcom/google/android/apps/inputmethod/libs/framework/core/ClipboardCandidateCompat;->candidateSensitive:Z
 
     const-wide/16 v4, 0x0
 
@@ -551,6 +544,14 @@
     return-object p0
 .end method
 
+.method public static isInjected()Z
+    .locals 1
+
+    sget-boolean v0, Lcom/google/android/apps/inputmethod/libs/framework/core/ClipboardCandidateCompat;->injected:Z
+
+    return v0
+.end method
+
 .method public static candidatesUpdated()V
     .locals 4
 
@@ -601,6 +602,21 @@
 
     if-eqz v3, :not_compat
 
+    const-string v3, "compat_clipboard:sensitive"
+
+    invoke-virtual {v3, v1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+
+    move-result v3
+
+    if-eqz v3, :ordinary_selection_payload
+
+    sget-object v1, Lcom/google/android/apps/inputmethod/libs/framework/core/ClipboardCandidateCompat;->candidatePayload:Ljava/lang/String;
+
+    if-eqz v1, :not_compat
+
+    goto :selection_payload_ready
+
+    :ordinary_selection_payload
     invoke-virtual {v2}, Ljava/lang/String;->length()I
 
     move-result v2
@@ -609,6 +625,7 @@
 
     move-result-object v1
 
+    :selection_payload_ready
     sget-object v2, Lcom/google/android/apps/inputmethod/libs/framework/core/ClipboardCandidateCompat;->candidateKey:Ljava/lang/String;
 
     sput-object v2, Lcom/google/android/apps/inputmethod/libs/framework/core/ClipboardCandidateCompat;->dismissedKey:Ljava/lang/String;
@@ -619,7 +636,11 @@
 
     sput-object v2, Lcom/google/android/apps/inputmethod/libs/framework/core/ClipboardCandidateCompat;->candidateKey:Ljava/lang/String;
 
+    sput-object v2, Lcom/google/android/apps/inputmethod/libs/framework/core/ClipboardCandidateCompat;->candidatePayload:Ljava/lang/String;
+
     sput-boolean v0, Lcom/google/android/apps/inputmethod/libs/framework/core/ClipboardCandidateCompat;->injected:Z
+
+    sput-boolean v0, Lcom/google/android/apps/inputmethod/libs/framework/core/ClipboardCandidateCompat;->candidateSensitive:Z
 
     const/4 v2, 0x1
 
@@ -898,24 +919,28 @@
     invoke-virtual {v0, v4, v3, v7, v1}, Landroid/widget/TextView;->setPadding(IIII)V
 
     :clipboard_icon_done
-    # The native candidate divider is the authoritative themed right edge.
-    # The holder may hide it as a last-column divider, so centerSingle... will
-    # reassert it after holder decoration and clone it only to the left edge.
-    if-eqz v2, :show_clipboard_left_separator
-
-    invoke-virtual {v2, v1}, Landroid/view/View;->setVisibility(I)V
-
-    :show_clipboard_left_separator
-    if-eqz v5, :hide_compat_right_separator
-
-    invoke-virtual {v5, v1}, Landroid/view/View;->setVisibility(I)V
-
-    :hide_compat_right_separator
-    if-eqz v6, :sync_dismiss_color
+    # Clipboard uses the same full-height/inset geometry as the Autofill rails,
+    # not the fixed 24dp divider between ordinary Candidate cells.
+    if-eqz v2, :show_clipboard_rail_separators
 
     const/16 v3, 0x8
 
-    invoke-virtual {v6, v3}, Landroid/view/View;->setVisibility(I)V
+    invoke-virtual {v2, v3}, Landroid/view/View;->setVisibility(I)V
+
+    :show_clipboard_rail_separators
+    if-eqz v6, :show_clipboard_left_separator
+
+    invoke-virtual {v6, v1}, Landroid/view/View;->setVisibility(I)V
+
+    :show_clipboard_left_separator
+    if-eqz v5, :sync_dismiss_color
+
+    if-eqz v6, :show_clipboard_left_only
+
+    invoke-static {p0, v5, v6}, Lcom/google/android/inputmethod/pinyin/headerplatform/HeaderActionSlot;->syncClipboardDividers(Landroid/view/View;Landroid/view/View;Landroid/view/View;)V
+
+    :show_clipboard_left_only
+    invoke-virtual {v5, v1}, Landroid/view/View;->setVisibility(I)V
 
     :sync_dismiss_color
     invoke-virtual {p0}, Lcom/google/android/apps/inputmethod/libs/framework/keyboard/SoftKeyView;->getRootView()Landroid/view/View;
@@ -1208,9 +1233,8 @@
     goto :scan_children
 
     :choose_gravity
-    # This runs after the holder's last-column decoration. Keep the actual
-    # native candidate divider as the right edge, then clone that exact themed
-    # appearance to the left divider inside the same parent/alpha hierarchy.
+    # This runs after holder decoration. Replace the fixed 24dp Candidate-cell
+    # divider with symmetric show-more-style rails, matching Inline Autofill.
     if-eqz v6, :select_gravity
 
     if-eqz v3, :select_gravity
@@ -1221,39 +1245,41 @@
 
     move-result-object v7
 
-    if-eqz v7, :force_left_separator
+    if-eqz v7, :find_clipboard_rail_left
 
-    const/4 v5, 0x0
+    const/16 v5, 0x8
 
     invoke-virtual {v7, v5}, Landroid/view/View;->setVisibility(I)V
 
-    :force_left_separator
+    :find_clipboard_rail_left
     const-string v4, "compat_clipboard_left_separator"
 
     invoke-virtual {v3, v4}, Landroid/view/View;->findViewWithTag(Ljava/lang/Object;)Landroid/view/View;
 
-    move-result-object v4
+    move-result-object v7
 
-    if-eqz v4, :hide_legacy_right_separator
-
-    invoke-static {v7, v4}, Lcom/google/android/apps/inputmethod/libs/framework/core/ClipboardCandidateCompat;->syncSeparatorAppearance(Landroid/view/View;Landroid/view/View;)V
-
-    const/4 v5, 0x0
-
-    invoke-virtual {v4, v5}, Landroid/view/View;->setVisibility(I)V
-
-    :hide_legacy_right_separator
     const-string v4, "compat_clipboard_right_separator"
 
     invoke-virtual {v3, v4}, Landroid/view/View;->findViewWithTag(Ljava/lang/Object;)Landroid/view/View;
 
     move-result-object v4
 
-    if-eqz v4, :select_gravity
+    if-eqz v4, :show_clipboard_rail_left
 
-    const/16 v5, 0x8
+    const/4 v5, 0x0
 
     invoke-virtual {v4, v5}, Landroid/view/View;->setVisibility(I)V
+
+    if-eqz v7, :select_gravity
+
+    invoke-static {v3, v7, v4}, Lcom/google/android/inputmethod/pinyin/headerplatform/HeaderActionSlot;->syncClipboardDividers(Landroid/view/View;Landroid/view/View;Landroid/view/View;)V
+
+    :show_clipboard_rail_left
+    if-eqz v7, :select_gravity
+
+    const/4 v5, 0x0
+
+    invoke-virtual {v7, v5}, Landroid/view/View;->setVisibility(I)V
 
     :select_gravity
     const v0, 0x800003
@@ -1439,9 +1465,13 @@
 
     sput-object v0, Lcom/google/android/apps/inputmethod/libs/framework/core/ClipboardCandidateCompat;->candidateKey:Ljava/lang/String;
 
+    sput-object v0, Lcom/google/android/apps/inputmethod/libs/framework/core/ClipboardCandidateCompat;->candidatePayload:Ljava/lang/String;
+
     const/4 v1, 0x0
 
     sput-boolean v1, Lcom/google/android/apps/inputmethod/libs/framework/core/ClipboardCandidateCompat;->injected:Z
+
+    sput-boolean v1, Lcom/google/android/apps/inputmethod/libs/framework/core/ClipboardCandidateCompat;->candidateSensitive:Z
 
     const/16 v2, 0x8
 

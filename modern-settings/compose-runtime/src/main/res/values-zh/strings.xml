@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="modern_settings_title">Google 拼音输入法设置</string>
+    <string name="modern_settings_home_input_title">输入设置</string>
+    <string name="modern_settings_home_input_summary">拼音、英文、滑行输入和纠错</string>
+    <string name="modern_settings_home_keyboard_title">键盘</string>
+    <string name="modern_settings_home_keyboard_summary">外观、布局、按键、反馈和手写</string>
+    <string name="modern_settings_home_dictionary_title">词典与备份</string>
+    <string name="modern_settings_home_dictionary_summary">用户词典、健康状态、备份和导入</string>
+    <string name="modern_settings_home_other_title">其他</string>
+    <string name="modern_settings_home_other_summary">启动器图标、关于和法律信息</string>
+    <string name="modern_settings_launcher_icon_title">显示应用图标</string>
+    <string name="modern_settings_launcher_icon_summary">在启动器中显示应用图标</string>
+    <string name="modern_settings_about_title">关于</string>
+    <string name="modern_settings_about_summary">项目仓库、服务条款、隐私政策、开源许可和版本</string>
+    <string name="modern_settings_terms_title">服务条款</string>
+    <string name="modern_settings_privacy_title">隐私政策</string>
+    <string name="modern_settings_repository_title">GitHub 仓库</string>
+    <string name="modern_settings_licenses_title">开源许可</string>
+    <string name="modern_settings_licenses_summary">查看开源软件许可详情</string>
+    <string name="modern_settings_version_title">当前版本</string>
+    <string name="modern_settings_version_unknown">未知</string>
+    <string name="modern_settings_chinese_input_summary">拼音方案、混合输入、联想和模糊拼音</string>
+    <string name="modern_settings_english_input_summary">纠错、建议、预测和自动大写</string>
+    <string name="modern_settings_keyboard_appearance_title">外观与布局</string>
+    <string name="modern_settings_theme_title">主题背景</string>
+    <string name="modern_settings_theme_page_summary">跟随主题、浅色模式主题、深色模式主题和固定主题</string>
+    <string name="modern_settings_system_auto_theme_title">跟随主题</string>
+    <string name="modern_settings_system_auto_theme_summary">根据系统深浅色模式自动切换主题</string>
+    <string name="modern_settings_light_mode_theme_title">浅色模式主题</string>
+    <string name="modern_settings_light_mode_theme_summary">选择系统处于浅色模式时使用的主题</string>
+    <string name="modern_settings_dark_mode_theme_title">深色模式主题</string>
+    <string name="modern_settings_dark_mode_theme_summary">选择系统处于深色模式时使用的主题</string>
+    <string name="modern_settings_fixed_theme_title">固定主题</string>
+    <string name="modern_settings_fixed_theme_summary">选择关闭「跟随主题」时使用的主题</string>
+    <string name="modern_settings_theme_requires_follow_enabled">开启「跟随主题」后可设置</string>
+    <string name="modern_settings_theme_requires_follow_disabled">关闭「跟随主题」后可设置</string>
+    <string name="modern_settings_keyboard_appearance_summary">主题、单手模式和键盘高度</string>
+    <string name="modern_settings_keyboard_keys_title">按键与切换</string>
+    <string name="modern_settings_keyboard_keys_summary">按键气泡、输入按钮、切换和交互</string>
+    <string name="modern_settings_keyboard_feedback_summary">声音、音量、振动和强度</string>
+    <string name="modern_settings_handwriting_summary">识别速度和笔迹粗细</string>
+    <string name="modern_settings_specialized_page_pending">此专用设置页面尚未迁移，现有旧版行为保持不变。</string>
+    <string name="modern_settings_dictionary_health_title">当前用户词库状态</string>
+    <string name="modern_settings_dictionary_health_loading">正在读取当前用户词库……</string>
+    <string name="modern_settings_dictionary_health_refresh">点击重新检查</string>
+    <string name="modern_settings_dictionary_backup_section">自动备份</string>
+    <string name="modern_settings_dictionary_auto_backup_title">自动备份用户字典</string>
+    <string name="modern_settings_dictionary_location_title">备份和导入位置</string>
+    <string name="modern_settings_dictionary_interval_title">备份频率</string>
+    <string name="modern_settings_dictionary_retention_title">保留备份版本</string>
+    <string name="modern_settings_dictionary_backup_now_title">立即备份</string>
+    <string name="modern_settings_dictionary_import_title">导入用户词典备份</string>
+    <string name="modern_settings_dictionary_backup_in_progress">正在生成用户词典备份……</string>
+    <string name="modern_settings_dictionary_last_backup">上次备份：%1$s %2$s</string>
+    <string name="modern_settings_dictionary_backup_retained">备份文件在清除数据或卸载后仍会保留</string>
+    <string name="modern_settings_dictionary_location_unset">未选择（备份和导入共用）</string>
+    <string name="modern_settings_dictionary_location_inaccessible">位置不可访问，请重新选择</string>
+    <string name="modern_settings_dictionary_location_selected">已选择备份目录</string>
+    <string name="modern_settings_dictionary_backup_now_summary">立即导出到所选目录</string>
+    <string name="modern_settings_dictionary_location_required">请先选择备份和导入目录</string>
+    <string name="modern_settings_dictionary_import_summary">列出所选目录中的用户词典备份</string>
+    <string name="modern_settings_dictionary_import_choose_summary">选择已有备份目录并导入</string>
+    <string name="modern_settings_dictionary_import_list_title">导入用户词典备份</string>
+    <string name="modern_settings_dictionary_import_empty">所选目录中没有可访问的 Google 拼音用户词典备份。</string>
+    <string name="modern_settings_dictionary_import_confirm_title">导入用户词典备份？</string>
+    <string name="modern_settings_dictionary_import_confirm_message">将「%1$s」合并到当前用户词典？</string>
+    <string name="modern_settings_dictionary_import_action">导入</string>
+    <string name="modern_settings_dictionary_shortcuts_section">自定义短语</string>
+    <string name="modern_settings_dictionary_enable_shortcuts">启用自定义短语</string>
+    <string name="modern_settings_dictionary_edit_shortcuts">编辑自定义短语</string>
+    <string name="modern_settings_dictionary_system_editor_summary">打开系统用户词典编辑器</string>
+    <string name="modern_settings_dictionary_personalization_section">个人词典</string>
+    <string name="modern_settings_dictionary_contacts_title">建议联系人姓名</string>
+    <string name="modern_settings_dictionary_contacts_summary">使用「联系人」中的姓名提供输入建议</string>
+    <string name="modern_settings_dictionary_contacts_permission_summary">授权访问联系人后可提供姓名建议</string>
+    <string name="modern_settings_dictionary_contacts_permission_denied">未授予联系人访问权限</string>
+    <string name="modern_settings_dictionary_clear_title">清除用户词典</string>
+    <string name="modern_settings_dictionary_clear_summary">永久清除用户词典中已经学习的字词</string>
+    <string name="modern_settings_dictionary_clear_in_progress">正在清除用户词典……</string>
+    <string name="modern_settings_dictionary_clear_confirm_title">清除用户词典？</string>
+    <string name="modern_settings_dictionary_clear_confirm_message">此操作无法撤销。请输入 %1$s 以确认。</string>
+    <string name="modern_settings_dictionary_clear_code_label">确认数字</string>
+    <string name="modern_settings_dictionary_clear_action">清除</string>
+    <string name="modern_settings_dictionary_clear_success">已清除用户词典</string>
+    <string name="modern_settings_dictionary_clear_error">清除用户词典失败</string>
+    <string name="modern_settings_dictionary_grant_failed">所选目录未授予可持久保存的完整读写权限</string>
+    <string name="modern_settings_dictionary_location_saved">备份和导入目录已保存</string>
+    <string name="modern_settings_dictionary_internal_storage">内部存储</string>
+    <string name="modern_settings_dictionary_sd_card">SD 卡（%1$s）</string>
+    <string name="modern_settings_section_input">常规输入</string>
+    <string name="modern_settings_section_chinese_input">中文输入</string>
+    <string name="modern_settings_pinyin_scheme_title">拼音方案</string>
+    <string name="modern_settings_one_handed_mode_title">单手模式</string>
+    <string name="modern_settings_popup_on_keypress_title">按键时弹出显示字符</string>
+    <string name="modern_settings_voice_input_title">显示语音输入按钮</string>
+    <string name="modern_settings_fuzzy_pinyin_title">模糊拼音</string>
+    <string name="modern_settings_fuzzy_pinyin_detail_title">模糊拼音设置</string>
+    <string name="modern_settings_navigate_back">返回</string>
+    <string name="modern_settings_fuzzy_z_zh">z = zh</string>
+    <string name="modern_settings_fuzzy_z_zh_description">z = z h</string>
+    <string name="modern_settings_fuzzy_c_ch">c = ch</string>
+    <string name="modern_settings_fuzzy_c_ch_description">c = c h</string>
+    <string name="modern_settings_fuzzy_s_sh">s = sh</string>
+    <string name="modern_settings_fuzzy_s_sh_description">s = s h</string>
+    <string name="modern_settings_fuzzy_an_ang">an = ang</string>
+    <string name="modern_settings_fuzzy_an_ang_description">a n = a n g</string>
+    <string name="modern_settings_fuzzy_en_eng">en = eng</string>
+    <string name="modern_settings_fuzzy_en_eng_description">e n = e n g</string>
+    <string name="modern_settings_fuzzy_in_ing">in = ing</string>
+    <string name="modern_settings_fuzzy_in_ing_description">i n = i n g</string>
+    <string name="modern_settings_fuzzy_l_n">l = n</string>
+    <string name="modern_settings_fuzzy_l_n_description">l = n</string>
+    <string name="modern_settings_fuzzy_f_h">f = h</string>
+    <string name="modern_settings_fuzzy_f_h_description">f = h</string>
+    <string name="modern_settings_fuzzy_r_l">r = l</string>
+    <string name="modern_settings_fuzzy_r_l_description">r = l</string>
+    <string name="modern_settings_fuzzy_k_g">k = g</string>
+    <string name="modern_settings_fuzzy_k_g_description">k = g</string>
+    <string name="modern_settings_fuzzy_ian_iang">ian = iang</string>
+    <string name="modern_settings_fuzzy_ian_iang_description">i a n = i a n g</string>
+    <string name="modern_settings_fuzzy_uan_uang">uan = uang</string>
+    <string name="modern_settings_fuzzy_uan_uang_description">u a n = u a n g</string>
+    <string name="modern_settings_section_english_input">英文输入</string>
+    <string name="modern_settings_section_key_feedback">按键反馈</string>
+    <string name="modern_settings_section_layout_gestures">布局和手势</string>
+    <string name="modern_settings_section_handwriting">手写</string>
+    <string name="modern_settings_sound_title">按键音</string>
+    <string name="modern_settings_volume_title">按键音量</string>
+    <string name="modern_settings_vibration_title">按键振动</string>
+    <string name="modern_settings_vibration_duration_title">振动时长</string>
+    <string name="modern_settings_keyboard_height_title">键盘高度</string>
+    <string name="modern_settings_slide_sensitivity_title">滑动灵敏度</string>
+    <string name="modern_settings_long_press_title">长按延迟</string>
+    <string name="modern_settings_handwriting_timeout_title">识别等待时间</string>
+    <string name="modern_settings_handwriting_stroke_width_title">笔画宽度</string>
+    <string name="modern_settings_double_space_title">双空格句号</string>
+    <string name="modern_settings_double_space_summary">点按两次空格键可插入句号和空格</string>
+    <string name="modern_settings_scrub_move_title">滑动空格键移动光标</string>
+    <string name="modern_settings_scrub_move_summary">在空格键上左右滑动以移动光标</string>
+    <string name="modern_settings_gesture_input_title">启用滑行输入</string>
+    <string name="modern_settings_gesture_input_summary">在字母之间滑动以输入字词</string>
+    <string name="modern_settings_gesture_preview_title">动态建议预览</string>
+    <string name="modern_settings_gesture_preview_summary">滑行输入时显示建议字词</string>
+    <string name="modern_settings_gesture_auto_commit_title">自动提交滑行输入</string>
+    <string name="modern_settings_gesture_auto_commit_summary">下一次滑行输入前自动提交当前输入内容</string>
+    <string name="modern_settings_requires_gesture_input">开启滑行输入后可使用此设置</string>
+    <string name="modern_settings_show_simplified_traditional_header_toggle_title">显示简繁切换按钮</string>
+    <string name="modern_settings_show_simplified_traditional_header_toggle_summary">在语音输入或收起键左侧显示快捷切换按钮</string>
+    <string name="modern_settings_show_english_keyboard_title">显示英文键盘</string>
+    <string name="modern_settings_show_emoji_switch_key_title">显示表情符号切换键</string>
+    <string name="modern_settings_show_emoji_switch_key_summary">启用表情符号切换键后，语言切换键将无法显示</string>
+    <string name="modern_settings_show_language_switch_key_title">显示语言切换键</string>
+    <string name="modern_settings_switch_to_other_imes_title">切换到其他输入法</string>
+    <string name="modern_settings_switch_to_other_imes_summary">语言切换键可切换到其他输入法</string>
+    <string name="modern_settings_physical_alt_title">使用实体键盘 Alt 键输入符号</string>
+    <string name="modern_settings_physical_alt_summary">连接实体键盘时使用 Alt 键输入符号</string>
+    <string name="modern_settings_chinese_english_title">建议英语单词</string>
+    <string name="modern_settings_chinese_english_summary">在输入拼音时建议热门英语单词</string>
+    <string name="modern_settings_chinese_digits_title">建议数字</string>
+    <string name="modern_settings_chinese_digits_summary">在输入拼音时建议数字</string>
+    <string name="modern_settings_suggest_emojis_title">建议表情符号</string>
+    <string name="modern_settings_suggest_emojis_summary">输入时建议表情符号</string>
+    <string name="modern_settings_spatial_correction_title">智能更正</string>
+    <string name="modern_settings_spatial_correction_summary">错别字智能更正</string>
+    <string name="modern_settings_traditional_chinese_title">繁体中文</string>
+    <string name="modern_settings_chinese_prediction_title">中文联想</string>
+    <string name="modern_settings_chinese_prediction_summary">根据上一个字词提供建议</string>
+    <string name="modern_settings_automatic_space_title">自动插入空格</string>
+    <string name="modern_settings_automatic_space_summary">在英文单词之间自动插入空格</string>
+    <string name="modern_settings_block_offensive_words_title">屏蔽不当字词</string>
+    <string name="modern_settings_block_offensive_words_summary">不提供可能具有冒犯性的字词建议</string>
+    <string name="modern_settings_latin_auto_correction_title">自动拼写更正</string>
+    <string name="modern_settings_latin_auto_correction_summary">自动更正拼写错误的字词</string>
+    <string name="modern_settings_latin_show_suggestions_title">显示建议</string>
+    <string name="modern_settings_latin_show_suggestions_summary">输入时显示建议字词</string>
+    <string name="modern_settings_next_word_prediction_title">下一个字词联想</string>
+    <string name="modern_settings_next_word_prediction_summary">根据上一个字词提供建议</string>
+    <string name="modern_settings_requires_show_suggestions">开启「显示建议」后可使用此设置</string>
+    <string name="modern_settings_auto_capitalization_title">自动大写</string>
+    <string name="modern_settings_auto_capitalization_summary">将每个句子的第一个字词首字母大写</string>
+    <string name="modern_settings_enabled">已开启</string>
+    <string name="modern_settings_disabled">已关闭</string>
+    <string name="modern_settings_system_default">系统默认</string>
+    <string name="modern_settings_system_default_explanation">由系统决定，不对应数值零</string>
+    <string name="modern_settings_dependency_disabled">父开关已关闭，启用后可设置自定义值</string>
+    <string name="modern_settings_set_custom">设置自定义值</string>
+    <string name="modern_settings_choose_custom_unsaved">选择自定义值（尚未保存）</string>
+    <string name="modern_settings_cancel">取消</string>
+    <string name="modern_settings_apply">应用</string>
+    <string name="modern_settings_use_system_default">使用系统默认</string>
+    <string name="modern_settings_use_default">使用默认值</string>
+    <string name="modern_settings_decrease_volume">降低按键音量</string>
+    <string name="modern_settings_increase_volume">提高按键音量</string>
+    <string name="modern_settings_decrease_vibration">缩短振动时长</string>
+    <string name="modern_settings_increase_vibration">延长振动时长</string>
+    <string name="modern_settings_percent_format">%1$d%%</string>
+    <string name="modern_settings_milliseconds_format">%1$d ms</string>
+    <string name="modern_settings_value_read_only">%1$s，%2$s，只读</string>
+    <string name="modern_settings_value_adjustable">%1$s，%2$s，可调整</string>
+    <string name="modern_settings_tplus_stroke_filter_title">拼音笔画过滤</string>
+    <string name="modern_settings_tplus_stroke_filter_summary">在 T+ 拼音中开启后会关闭滑行输入；候选出现后可直接在键盘书写最多五笔筛选原候选</string>
+</resources>

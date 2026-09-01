@@ -214,7 +214,7 @@ public final class StrokeFilterCompat {
             int state = getState();
             String text;
             if (state == StrokeFilterCandidateSession.SCANNING && prefix.length() > 0) {
-                text = localized("stroke_filter_scanning", "筛选…");
+                text = localized("stroke_filter_scanning", "筛选……");
             } else if (state == StrokeFilterCandidateSession.NO_MATCH && prefix.length() > 0) {
                 text = localized("stroke_filter_no_match", "无匹配");
             } else if (captureActive && prefix.length() == 0) {

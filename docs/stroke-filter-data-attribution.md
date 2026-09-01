@@ -1,6 +1,6 @@
 # 拼音笔画过滤数据来源与署名
 
-T+ 拼音笔画过滤使用 **Conway Stroke Data** 的“Unicode 汉字到五类笔顺序列”数据：
+T+ 拼音笔画过滤使用 **Conway Stroke Data** 的「Unicode 汉字到五类笔顺序列」数据：
 
 | 字段 | 固定值 |
 | --- | --- |

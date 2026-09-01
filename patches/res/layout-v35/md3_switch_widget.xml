@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.inputmethod.pinyin.Md3SwitchView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@android:id/checkbox"
+    android:layout_width="52dp"
+    android:layout_height="48dp"
+    android:clickable="false"
+    android:focusable="false"
+    android:importantForAccessibility="no"
+    android:duplicateParentState="true" />

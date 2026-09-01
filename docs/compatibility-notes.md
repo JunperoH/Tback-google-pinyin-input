@@ -4,11 +4,16 @@
 
 - 原版 package：`com.google.android.inputmethod.pinyin`
 - Compatibility v10+ package：`com.google.android.inputmethod.pinyin.compat`
-- versionName：`4.5.2.193126728-arm64-v8a`
-- versionCode：`4520313`
+- 原版 versionName：`4.5.2.193126728-arm64-v8a`
+- 原版 versionCode：`4520313`
+- 最新已发布正式版：`v2.0.0`（versionCode `4520385`，targetSdk 36）
+- 上一正式版：`v1.0.3`（versionCode `4520384`，targetSdk 28）
 - minSdk：17
-- targetSdk：26
+- 原版 targetSdk：26
+- 已验收并合并的现代化阶段：targetSdk 29、30、31、32、33、34、35、36
+- Android 17 / targetSdk 37：独立后续调查
 - 架构：arm64-v8a
+- 有效 ABI 运行下限：API 21；虽然 Manifest `minSdkVersion=17`，但 Android 在 API 21 前不存在 `arm64-v8a` 应用 ABI，且本 APK 不含 32 位 native payload，因此 API 17 只能做静态门禁，不能进行真实安装/启动验收
 
 ## 原生库
 
@@ -28,7 +33,7 @@
 
 补丁在以下时机重新应用主题颜色：
 
-1. `PinyinIME.onStartInputView()` 后；
+1. `PinyinIME.onStartInputView()` 后
 2. 旧框架调用 `Window.setNavigationBarColor()` 后。
 
 ## 滑动事件与高刷新率
@@ -37,7 +42,9 @@
 
 v5 曾把两个分页容器的取消辅助器提前到父分页器之前执行。这会让分页器把有效的 `ACTION_UP` 当作 `ACTION_CANCEL`，慢速滑动只能依靠超过半页的位移翻页。v6 恢复原始调用顺序；v7 进一步把提交距离从 25 dp 降至 8 dp，并移除最低 fling 速度的附加条件。
 
-Pixel 10 Pro 的屏幕工作在 120 Hz，但旧版输入法没有帧率偏好。v6 曾同时通过窗口 `preferredRefreshRate` 和 `View.setFrameRate()` 固定请求 120 Hz，真机使用中可能妨碍 LTPO/ARR 降频并引起异常发热。v29 对照 Gboard 改用 Window touch boost，但真机确认它不能使 2018 年 Google 拼音的旧 Surface 生成高频帧；v30 实验性的交互期 View vote 也没有带来可感知改善。因此 v31 完全移除 `FrameRateCompat`、Window boost、固定/临时 View vote 及相关生命周期注入，恢复由 Android 系统默认调度帧率。高刷新率将在完成 target API 现代化后，基于新的渲染与帧率接口重新设计。
+Pixel 10 Pro 的屏幕工作在 120 Hz，但旧版输入法没有帧率偏好。v6 曾同时通过窗口 `preferredRefreshRate` 和 `View.setFrameRate()` 固定请求 120 Hz，真机使用中可能妨碍 LTPO/ARR 降频并引起异常发热。v29 对照 Gboard 改用 Window touch boost，但真机确认它不能使 2018 年 Google 拼音的旧 Surface 生成高频帧；v30 实验性的交互期 View vote 也没有带来可感知改善。因此 v31 完全移除 `FrameRateCompat`、Window boost、固定/临时 View vote 及相关生命周期注入，恢复由 Android 系统默认调度帧率。
+
+完成 target API 现代化后，当前实现只在 API 36 的明确原生运动生命周期内调用 `View.setRequestedFrameRate(HIGH)`：Candidate 展开/收起绑定 80 ms Animator，Emoji、颜文字和标点/符号分页绑定 dragging 及 Scroller settle。结束、取消、隐藏或 detach 后立即恢复 `NO_PREFERENCE`。两条路径共用 `ViewFrameRateCompat` 反射桥，但不共享 View 状态、不固定具体 Hz，也不启用 Window 级全局 boost。
 
 ## 失效网络组件清理
 
@@ -63,13 +70,34 @@ Compatibility v20 为可变词库文件增加恢复层。原版持久化按 `主
 
 ## target SDK 策略
 
-当前只提升到 28。后续提升前需要处理：
+正式 Release `v1.0.3` 冻结在 target 28。`feat/target-sdk-29` 至 `feat/target-sdk-36` 采用独立长期分支逐级完成验收，最终 target 36 V19 已合并到 `master` 并发布为正式 `v2.0.0`。后续功能分支都从该 target 36 基线创建。Android 17 仍不与 Material You/MD3、16 KiB 或预测返回混合。完整历史、风险和完成条件见 [`target-sdk-modernization-plan.md`](target-sdk-modernization-plan.md)。
 
-- target 31+：所有 PendingIntent 必须声明 immutable/mutable；
-- target 31+：所有带 intent-filter 的组件必须显式 exported；
-- target 33/34+：动态 Receiver 注册 flags；
-- target 35+：Activity edge-to-edge 和旧设置 UI；
-- 废弃存储、账号、同步、Firebase 和反馈服务。
+已知边界：
+
+- target 29/30：非 SDK 接口和 scoped storage
+- target 31+：所有 PendingIntent 必须声明 immutable/mutable
+- target 31+：所有带 intent-filter 的组件必须显式 exported
+- target 33/34+：动态 Receiver 注册 flags
+- target 35+：Activity edge-to-edge、TextView 测量和旧设置 UI
+- target 36+：强制 edge-to-edge 和 predictive back
+- target 37+：static final 反射、native DCL、本地网络权限和 CJKV IME 辅助功能。
+
+废弃账号同步、Firebase、反馈上传和在线词典更新已在 target 现代化前清理。
+
+## Android 16 / target 36 验收边界
+
+`feat/target-sdk-36` 的 V19 release-like 已在 Pixel 10 Pro / Android 16 上验收。IME Window 覆盖到显示底部，应用收到完整 IME Insets；InputView 内部保留动态测量的非交互底部视觉面，系统导航和手势仍由 SystemUI 控制。
+
+最终视觉规则有意保持狭窄：
+
+- 图片主题普通状态用一个共享逻辑高度绘制上部和导航下方切片，并叠加用户选择的原生 body 阴影
+- 新图片裁剪尺寸包含动态稳定导航高度，不重写已有裁剪文件
+- 内置主题使用实际 `SoftKeyboardView.background` 延伸键盘主体颜色
+- 展开候选不切换导航视觉，不复制候选页、候选行、候选按键或任何候选内容
+- 不使用固定导航高度、隐藏 ID、framework 内部类名、反射或 DecorView reparent
+- 临时候选/主题诊断已从 release-like artifact 删除。
+
+V19 三按钮和手势模式均保持 IME Insets `[0,1481][1080,2410]`、IME Window `[0,172][1080,2410]`、Surface `shown/HAS_DRAWN`。三按钮 navigationBars 为 `[0,2284][1080,2410]`，手势 navigationBars 为 `[0,2347][1080,2410]`、mandatorySystemGestures 为 `[0,2326][1080,2410]`。这些是动态现场值，不得作为代码常量。
 
 ## 手写崩溃
 
@@ -85,7 +113,7 @@ java.lang.IllegalArgumentException: Invalid Region.Op - only INTERSECT and DIFFE
 `INTERSECT` 和 `DIFFERENCE`。Compatibility v4 将手写及滑行绘制路径中的 6 处
 `REPLACE` 改为 `INTERSECT`，避免首次落笔立即终止输入法进程。由于
 `INTERSECT` 会累积缩小离屏 Canvas 的裁剪区，手写渲染器还需要在每个点绘制前后
-配对调用 `Canvas.save()` / `Canvas.restore()`；否则识别正常但笔迹几乎完全不可见。
+配对调用 `Canvas.save()` / `Canvas.restore()`，否则识别正常但笔迹几乎完全不可见。
 
 手写路径随后会调用：
 

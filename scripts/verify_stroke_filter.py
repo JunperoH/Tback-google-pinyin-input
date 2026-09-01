@@ -140,6 +140,51 @@ def verify_asset(asset: Path) -> None:
     expect_rejected(bytes(wrong_digest), "source digest")
 
 
+def verify_modern_setting() -> None:
+    source = ROOT / "modern-settings/compose-runtime/src/main"
+    package = source / (
+        "kotlin/com/google/android/inputmethod/pinyin/modernsettings/compose"
+    )
+    contracts = (package / "BooleanSettingContracts.kt").read_text(encoding="utf-8")
+    repository = (package / "LegacySettingsRepository.kt").read_text(encoding="utf-8")
+    screen = (package / "InputSettingsScreens.kt").read_text(encoding="utf-8")
+
+    for token in (
+        "val tplusStrokeFilter = BooleanSettingContract(",
+        'key = "tplus_stroke_filter_enabled"',
+        "defaultValue = false",
+        "val tplusBatch = listOf(",
+        "tplusStrokeFilter,",
+        "thirdPlainBatch + tplusBatch +",
+    ):
+        require(token in contracts, f"Modern T+ Boolean contract is missing: {token}")
+    for token in (
+        "tplusStrokeFilter = readBoolean(BooleanSettingContracts.tplusStrokeFilter)",
+        "val tplusStrokeFilter: BooleanSettingState",
+    ):
+        require(token in repository, f"Modern T+ preference repository is missing: {token}")
+    for token in (
+        '"stroke_filter_setting_title"',
+        "R.string.modern_settings_tplus_stroke_filter_title",
+        '"stroke_filter_setting_summary"',
+        "R.string.modern_settings_tplus_stroke_filter_summary",
+        "checked = snapshot.tplusStrokeFilter.value",
+        "actions.onBooleanChange(BooleanSettingContracts.tplusStrokeFilter, it)",
+    ):
+        require(token in screen, f"Modern T+ setting row is missing: {token}")
+
+    for qualifier in ("values", "values-zh", "values-zh-rTW", "values-zh-rHK"):
+        strings = (source / "res" / qualifier / "strings.xml").read_text(encoding="utf-8")
+        for name in (
+            "modern_settings_tplus_stroke_filter_title",
+            "modern_settings_tplus_stroke_filter_summary",
+        ):
+            require(
+                f'name="{name}"' in strings,
+                f"Modern T+ string is missing from {qualifier}: {name}",
+            )
+
+
 def verify_decoded(decoded: Path, allow_test_hook: bool) -> None:
     hmm = decoded / "smali/com/google/android/apps/inputmethod/libs/hmm"
     abstract_hmm = (hmm / "AbstractHmmDecodeProcessor.smali").read_text(encoding="utf-8")
@@ -431,6 +476,7 @@ def main() -> None:
     args = parser.parse_args()
     verify_expansion_logic()
     verify_asset(DEFAULT_OUTPUT)
+    verify_modern_setting()
     if args.decoded is not None:
         verify_decoded(args.decoded.resolve(), args.allow_test_hook)
     print("Stroke-filter data verification passed")

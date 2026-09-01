@@ -5,6 +5,6 @@
     <string name="stroke_filter_toggle_label">筆</string>
     <string name="stroke_filter_toggle_content_description">暫停或恢復自動拼音筆畫擷取</string>
     <string name="stroke_filter_capturing">筆·畫</string>
-    <string name="stroke_filter_scanning">篩選…</string>
+    <string name="stroke_filter_scanning">篩選……</string>
     <string name="stroke_filter_no_match">無相符項目</string>
 </resources>

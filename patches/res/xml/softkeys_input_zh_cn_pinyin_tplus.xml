@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <framework>
     <softkeys>
+        <softkey_list splitter=" ">
         <softkey_template id="@id/softkey_template_tplus_pair" layout="@layout/softkey_9key" slide_sensitivity="LESS" popup_timing="ON_GESTURE" multi_touch="false" content_description="$key_text$">
             <action type="PRESS" data="$press_data$" keycode="$keycode_press$" intention="DECODE" />
             <action type="LONG_PRESS" data="$long_press_data$" keycode="PLAIN_TEXT" intention="COMMIT" popup_label="$long_press_data$" popup_layout="@attr/PopupBubbleRectangularLayout" />
@@ -9,6 +10,7 @@
             <label location="@id/label" value="$key_text$" />
             <label location="@id/label_sup" value="$alternate_data$" />
         </softkey_template>
+        </softkey_list>
         <softkey_list template_id="@id/softkey_template_tplus_pair" splitter=" ">
             <softkey id="@id/softkey_tplus_qw" press_data="qw" keycode_press="Q" left_data="q" keycode_left="Q" right_data="w" keycode_right="W" alternate_data="1" long_press_data="1 q w Q W" key_text="Q W" />
             <softkey id="@id/softkey_tplus_er" press_data="er" keycode_press="E" left_data="e" keycode_left="E" right_data="r" keycode_right="R" alternate_data="2" long_press_data="2 e r E R" key_text="E R" />
@@ -24,6 +26,7 @@
             <softkey id="@id/softkey_tplus_bn" press_data="bn" keycode_press="B" left_data="b" keycode_left="B" right_data="n" keycode_right="N" alternate_data="?" long_press_data="\? b n B N" key_text="B N" />
         </softkey_list>
 
+        <softkey_list splitter=" ">
         <softkey_template id="@id/softkey_template_tplus_pair_upper" layout="@layout/softkey_9key" slide_sensitivity="LESS" popup_timing="ON_GESTURE" multi_touch="false" content_description="$key_text$">
             <action type="PRESS" data="$press_data$" keycode="$keycode_press$" intention="DECODE" />
             <action type="LONG_PRESS" data="$long_press_data$" keycode="PLAIN_TEXT" intention="COMMIT" popup_label="$long_press_data$" popup_layout="@attr/PopupBubbleRectangularLayout" />
@@ -32,6 +35,7 @@
             <label location="@id/label" value="$key_text$" />
             <label location="@id/label_sup" value="$alternate_data$" />
         </softkey_template>
+        </softkey_list>
         <softkey_list template_id="@id/softkey_template_tplus_pair_upper" splitter=" ">
             <softkey id="@id/softkey_tplus_up_qw" press_data="QW" keycode_press="Q" left_data="Q" keycode_left="Q" right_data="W" keycode_right="W" alternate_data="1" long_press_data="1 q w Q W" key_text="Q W" />
             <softkey id="@id/softkey_tplus_up_er" press_data="ER" keycode_press="E" left_data="E" keycode_left="E" right_data="R" keycode_right="R" alternate_data="2" long_press_data="2 e r E R" key_text="E R" />
@@ -47,6 +51,7 @@
             <softkey id="@id/softkey_tplus_up_bn" press_data="BN" keycode_press="B" left_data="B" keycode_left="B" right_data="N" keycode_right="N" alternate_data="?" long_press_data="\? b n B N" key_text="B N" />
         </softkey_list>
 
+        <softkey_list splitter=" ">
         <softkey id="@id/softkey_tplus_l" layout="@layout/softkey_9key" slide_sensitivity="LESS" popup_timing="ON_GESTURE" multi_touch="false" content_description="L hyphen">
             <action type="PRESS" data="l" keycode="L" intention="DECODE" />
             <action type="LONG_PRESS" data="0 l L" keycode="PLAIN_TEXT" intention="COMMIT" popup_label="0 l L" popup_layout="@attr/PopupBubbleRectangularLayout" />
@@ -75,5 +80,6 @@
             <label location="@id/label" value="M '" />
             <label location="@id/label_sup" value="," />
         </softkey>
+        </softkey_list>
     </softkeys>
 </framework>

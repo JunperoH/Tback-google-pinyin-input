@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="modern_settings_title">Google Pinyin Input settings</string>
+    <string name="modern_settings_home_input_title">Input settings</string>
+    <string name="modern_settings_home_input_summary">Pinyin, English, glide typing, and correction</string>
+    <string name="modern_settings_home_keyboard_title">Keyboard</string>
+    <string name="modern_settings_home_keyboard_summary">Appearance, layout, keys, feedback, and handwriting</string>
+    <string name="modern_settings_home_dictionary_title">Dictionary and backup</string>
+    <string name="modern_settings_home_dictionary_summary">User dictionary, health, backup, and import</string>
+    <string name="modern_settings_home_other_title">Other</string>
+    <string name="modern_settings_home_other_summary">Launcher icon, about, and legal information</string>
+    <string name="modern_settings_launcher_icon_title">Show app icon</string>
+    <string name="modern_settings_launcher_icon_summary">Show the app icon in the launcher</string>
+    <string name="modern_settings_about_title">About</string>
+    <string name="modern_settings_about_summary">Repository, terms, privacy, licenses, and version</string>
+    <string name="modern_settings_terms_title">Terms of service</string>
+    <string name="modern_settings_privacy_title">Privacy policy</string>
+    <string name="modern_settings_repository_title">GitHub repository</string>
+    <string name="modern_settings_licenses_title">Open source licenses</string>
+    <string name="modern_settings_licenses_summary">License details for open source software</string>
+    <string name="modern_settings_version_title">Current version</string>
+    <string name="modern_settings_version_unknown">Unknown</string>
+    <string name="modern_settings_chinese_input_summary">Pinyin scheme, mixed input, prediction, and Fuzzy Pinyin</string>
+    <string name="modern_settings_english_input_summary">Correction, suggestions, prediction, and capitalization</string>
+    <string name="modern_settings_keyboard_appearance_title">Appearance and layout</string>
+    <string name="modern_settings_theme_title">Theme</string>
+    <string name="modern_settings_theme_page_summary">Follow theme, light mode theme, dark mode theme, and fixed theme</string>
+    <string name="modern_settings_system_auto_theme_title">Follow theme</string>
+    <string name="modern_settings_system_auto_theme_summary">Switch themes automatically with the system light or dark mode</string>
+    <string name="modern_settings_light_mode_theme_title">Light mode theme</string>
+    <string name="modern_settings_light_mode_theme_summary">Choose the theme used while the system is in light mode</string>
+    <string name="modern_settings_dark_mode_theme_title">Dark mode theme</string>
+    <string name="modern_settings_dark_mode_theme_summary">Choose the theme used while the system is in dark mode</string>
+    <string name="modern_settings_fixed_theme_title">Fixed theme</string>
+    <string name="modern_settings_fixed_theme_summary">Choose the theme used while Follow theme is off</string>
+    <string name="modern_settings_theme_requires_follow_enabled">Turn on Follow theme to configure this setting</string>
+    <string name="modern_settings_theme_requires_follow_disabled">Turn off Follow theme to configure this setting</string>
+    <string name="modern_settings_keyboard_appearance_summary">Theme, one-handed mode, and keyboard height</string>
+    <string name="modern_settings_keyboard_keys_title">Keys and switching</string>
+    <string name="modern_settings_keyboard_keys_summary">Key popups, input buttons, switching, and interaction</string>
+    <string name="modern_settings_keyboard_feedback_summary">Sound, volume, vibration, and strength</string>
+    <string name="modern_settings_handwriting_summary">Recognition speed and stroke width</string>
+    <string name="modern_settings_specialized_page_pending">This specialized settings page has not yet been migrated. Its existing legacy behavior remains unchanged.</string>
+    <string name="modern_settings_dictionary_health_title">Current user dictionary status</string>
+    <string name="modern_settings_dictionary_health_loading">Reading the current user dictionary…</string>
+    <string name="modern_settings_dictionary_health_refresh">Tap to check again</string>
+    <string name="modern_settings_dictionary_backup_section">Automatic backup</string>
+    <string name="modern_settings_dictionary_auto_backup_title">Automatically back up user dictionary</string>
+    <string name="modern_settings_dictionary_location_title">Backup and import location</string>
+    <string name="modern_settings_dictionary_interval_title">Backup frequency</string>
+    <string name="modern_settings_dictionary_retention_title">Backups to retain</string>
+    <string name="modern_settings_dictionary_backup_now_title">Back up now</string>
+    <string name="modern_settings_dictionary_import_title">Import a user dictionary backup</string>
+    <string name="modern_settings_dictionary_backup_in_progress">Creating a user dictionary backup…</string>
+    <string name="modern_settings_dictionary_last_backup">Last backup: %1$s %2$s</string>
+    <string name="modern_settings_dictionary_backup_retained">Backup files remain after app data is cleared or the app is uninstalled</string>
+    <string name="modern_settings_dictionary_location_unset">Not selected (shared by backup and import)</string>
+    <string name="modern_settings_dictionary_location_inaccessible">Location is inaccessible; select it again</string>
+    <string name="modern_settings_dictionary_location_selected">Backup directory selected</string>
+    <string name="modern_settings_dictionary_backup_now_summary">Export to the selected directory now</string>
+    <string name="modern_settings_dictionary_location_required">Select a backup and import directory first</string>
+    <string name="modern_settings_dictionary_import_summary">List user dictionary backups in the selected directory</string>
+    <string name="modern_settings_dictionary_import_choose_summary">Select an existing backup directory and import</string>
+    <string name="modern_settings_dictionary_import_list_title">Import a user dictionary backup</string>
+    <string name="modern_settings_dictionary_import_empty">No accessible Google Pinyin user dictionary backups were found in the selected directory.</string>
+    <string name="modern_settings_dictionary_import_confirm_title">Import user dictionary backup?</string>
+    <string name="modern_settings_dictionary_import_confirm_message">Merge &quot;%1$s&quot; into the current user dictionary?</string>
+    <string name="modern_settings_dictionary_import_action">Import</string>
+    <string name="modern_settings_dictionary_shortcuts_section">Shortcuts dictionary</string>
+    <string name="modern_settings_dictionary_enable_shortcuts">Enable shortcuts dictionary</string>
+    <string name="modern_settings_dictionary_edit_shortcuts">Edit shortcuts dictionary</string>
+    <string name="modern_settings_dictionary_system_editor_summary">Open the system user dictionary editor</string>
+    <string name="modern_settings_dictionary_personalization_section">Personal dictionary</string>
+    <string name="modern_settings_dictionary_contacts_title">Suggest contact names</string>
+    <string name="modern_settings_dictionary_contacts_summary">Use names from Contacts for suggestions</string>
+    <string name="modern_settings_dictionary_contacts_permission_summary">Allow Contacts access to enable name suggestions</string>
+    <string name="modern_settings_dictionary_contacts_permission_denied">Contacts access was not granted</string>
+    <string name="modern_settings_dictionary_clear_title">Clear user dictionary</string>
+    <string name="modern_settings_dictionary_clear_summary">Permanently erase learned words in the user dictionary</string>
+    <string name="modern_settings_dictionary_clear_in_progress">Clearing user dictionary…</string>
+    <string name="modern_settings_dictionary_clear_confirm_title">Clear user dictionary?</string>
+    <string name="modern_settings_dictionary_clear_confirm_message">This cannot be undone. Enter %1$s to confirm.</string>
+    <string name="modern_settings_dictionary_clear_code_label">Confirmation number</string>
+    <string name="modern_settings_dictionary_clear_action">Clear</string>
+    <string name="modern_settings_dictionary_clear_success">User dictionary cleared</string>
+    <string name="modern_settings_dictionary_clear_error">Failed to clear user dictionary</string>
+    <string name="modern_settings_dictionary_grant_failed">The selected directory did not grant persistent read and write access</string>
+    <string name="modern_settings_dictionary_location_saved">Backup and import directory saved</string>
+    <string name="modern_settings_dictionary_internal_storage">Internal storage</string>
+    <string name="modern_settings_dictionary_sd_card">SD card (%1$s)</string>
+    <!-- These two persisted legacy status tokens intentionally remain Chinese in every locale. -->
+    <string name="modern_settings_dictionary_legacy_success_status" translatable="false">备份成功</string>
+    <string name="modern_settings_dictionary_legacy_location_validated" translatable="false">备份目录验证成功</string>
+    <string name="modern_settings_section_input">General input</string>
+    <string name="modern_settings_section_chinese_input">Chinese input</string>
+    <string name="modern_settings_pinyin_scheme_title">Pinyin scheme</string>
+    <string name="modern_settings_one_handed_mode_title">One-handed mode</string>
+    <string name="modern_settings_popup_on_keypress_title">Popup on keypress</string>
+    <string name="modern_settings_voice_input_title">Show voice input button</string>
+    <string name="modern_settings_fuzzy_pinyin_title">Fuzzy Pinyin</string>
+    <string name="modern_settings_fuzzy_pinyin_detail_title">Fuzzy Pinyin settings</string>
+    <string name="modern_settings_navigate_back">Navigate back</string>
+    <string name="modern_settings_fuzzy_z_zh">z = zh</string>
+    <string name="modern_settings_fuzzy_z_zh_description">z = z h</string>
+    <string name="modern_settings_fuzzy_c_ch">c = ch</string>
+    <string name="modern_settings_fuzzy_c_ch_description">c = c h</string>
+    <string name="modern_settings_fuzzy_s_sh">s = sh</string>
+    <string name="modern_settings_fuzzy_s_sh_description">s = s h</string>
+    <string name="modern_settings_fuzzy_an_ang">an = ang</string>
+    <string name="modern_settings_fuzzy_an_ang_description">a n = a n g</string>
+    <string name="modern_settings_fuzzy_en_eng">en = eng</string>
+    <string name="modern_settings_fuzzy_en_eng_description">e n = e n g</string>
+    <string name="modern_settings_fuzzy_in_ing">in = ing</string>
+    <string name="modern_settings_fuzzy_in_ing_description">i n = i n g</string>
+    <string name="modern_settings_fuzzy_l_n">l = n</string>
+    <string name="modern_settings_fuzzy_l_n_description">l = n</string>
+    <string name="modern_settings_fuzzy_f_h">f = h</string>
+    <string name="modern_settings_fuzzy_f_h_description">f = h</string>
+    <string name="modern_settings_fuzzy_r_l">r = l</string>
+    <string name="modern_settings_fuzzy_r_l_description">r = l</string>
+    <string name="modern_settings_fuzzy_k_g">k = g</string>
+    <string name="modern_settings_fuzzy_k_g_description">k = g</string>
+    <string name="modern_settings_fuzzy_ian_iang">ian = iang</string>
+    <string name="modern_settings_fuzzy_ian_iang_description">i a n = i a n g</string>
+    <string name="modern_settings_fuzzy_uan_uang">uan = uang</string>
+    <string name="modern_settings_fuzzy_uan_uang_description">u a n = u a n g</string>
+    <string name="modern_settings_section_english_input">English input</string>
+    <string name="modern_settings_section_key_feedback">Key feedback</string>
+    <string name="modern_settings_section_layout_gestures">Layout and gestures</string>
+    <string name="modern_settings_section_handwriting">Handwriting</string>
+    <string name="modern_settings_sound_title">Sound on keypress</string>
+    <string name="modern_settings_volume_title">Volume on keypress</string>
+    <string name="modern_settings_vibration_title">Vibrate on keypress</string>
+    <string name="modern_settings_vibration_duration_title">Vibration strength on keypress</string>
+    <string name="modern_settings_keyboard_height_title">Keyboard height</string>
+    <string name="modern_settings_slide_sensitivity_title">Slide input sensitivity</string>
+    <string name="modern_settings_long_press_title">Key long press delay</string>
+    <string name="modern_settings_handwriting_timeout_title">Handwriting speed</string>
+    <string name="modern_settings_handwriting_stroke_width_title">Handwriting stroke width</string>
+    <string name="modern_settings_double_space_title">Double-space period</string>
+    <string name="modern_settings_double_space_summary">Double-tap Space to insert a period followed by a space</string>
+    <string name="modern_settings_scrub_move_title">Slide on the space bar to move the cursor</string>
+    <string name="modern_settings_scrub_move_summary">Move the cursor by sliding left or right on the space bar</string>
+    <string name="modern_settings_gesture_input_title">Enable glide typing</string>
+    <string name="modern_settings_gesture_input_summary">Input a word by sliding through the letters</string>
+    <string name="modern_settings_gesture_preview_title">Dynamic suggestion preview</string>
+    <string name="modern_settings_gesture_preview_summary">Show the suggested word while gesturing</string>
+    <string name="modern_settings_gesture_auto_commit_title">Auto commit glide input</string>
+    <string name="modern_settings_gesture_auto_commit_summary">Commit the current composing text before the next glide input</string>
+    <string name="modern_settings_requires_gesture_input">Turn on glide typing to use this setting</string>
+    <string name="modern_settings_show_simplified_traditional_header_toggle_title">Show Simplified/Traditional Chinese switch</string>
+    <string name="modern_settings_show_simplified_traditional_header_toggle_summary">Show a quick switch to the left of the voice input or hide-keyboard button</string>
+    <string name="modern_settings_show_english_keyboard_title">Show English keyboard</string>
+    <string name="modern_settings_show_emoji_switch_key_title">Show emoji switch key</string>
+    <string name="modern_settings_show_emoji_switch_key_summary">When emoji switch key is enabled, the language switch key cannot be shown</string>
+    <string name="modern_settings_show_language_switch_key_title">Show language switch key</string>
+    <string name="modern_settings_switch_to_other_imes_title">Switch to other input methods</string>
+    <string name="modern_settings_switch_to_other_imes_summary">Language switch key switches to other input methods</string>
+    <string name="modern_settings_physical_alt_title">Alt key for symbols on a physical keyboard</string>
+    <string name="modern_settings_physical_alt_summary">Use Alt to enter symbols when a physical keyboard is connected</string>
+    <string name="modern_settings_chinese_english_title">Suggest English words</string>
+    <string name="modern_settings_chinese_english_summary">Suggest popular English words when inputting Pinyin</string>
+    <string name="modern_settings_chinese_digits_title">Suggest digits</string>
+    <string name="modern_settings_chinese_digits_summary">Suggest digits when inputting Pinyin</string>
+    <string name="modern_settings_suggest_emojis_title">Suggest emojis</string>
+    <string name="modern_settings_suggest_emojis_summary">Suggest emojis while typing</string>
+    <string name="modern_settings_spatial_correction_title">Intelligent correction</string>
+    <string name="modern_settings_spatial_correction_summary">Intelligently correct mistyped words</string>
+    <string name="modern_settings_traditional_chinese_title">Traditional Chinese</string>
+    <string name="modern_settings_chinese_prediction_title">Chinese prediction</string>
+    <string name="modern_settings_chinese_prediction_summary">Use the previous word to make suggestions</string>
+    <string name="modern_settings_automatic_space_title">Insert spaces automatically</string>
+    <string name="modern_settings_automatic_space_summary">Insert a space automatically between English words</string>
+    <string name="modern_settings_block_offensive_words_title">Block offensive words</string>
+    <string name="modern_settings_block_offensive_words_summary">Do not suggest potentially offensive words</string>
+    <string name="modern_settings_latin_auto_correction_title">Auto spell correction</string>
+    <string name="modern_settings_latin_auto_correction_summary">Automatically correct mistyped words</string>
+    <string name="modern_settings_latin_show_suggestions_title">Show suggestions</string>
+    <string name="modern_settings_latin_show_suggestions_summary">Display suggested words while typing</string>
+    <string name="modern_settings_next_word_prediction_title">Next-word suggestions</string>
+    <string name="modern_settings_next_word_prediction_summary">Use the previous word in making suggestions</string>
+    <string name="modern_settings_requires_show_suggestions">Turn on Show suggestions to use this setting</string>
+    <string name="modern_settings_auto_capitalization_title">Auto capitalization</string>
+    <string name="modern_settings_auto_capitalization_summary">Capitalize the first word of each sentence</string>
+    <string name="modern_settings_enabled">On</string>
+    <string name="modern_settings_disabled">Off</string>
+    <string name="modern_settings_system_default">System default</string>
+    <string name="modern_settings_system_default_explanation">Determined by the system; this is not numeric zero</string>
+    <string name="modern_settings_dependency_disabled">The parent setting is off. Turn it on to set a custom value</string>
+    <string name="modern_settings_set_custom">Set custom value</string>
+    <string name="modern_settings_choose_custom_unsaved">Choose a custom value (not saved)</string>
+    <string name="modern_settings_cancel">Cancel</string>
+    <string name="modern_settings_apply">Apply</string>
+    <string name="modern_settings_use_system_default">Use system default</string>
+    <string name="modern_settings_use_default">Use default</string>
+    <string name="modern_settings_decrease_volume">Decrease keypress volume</string>
+    <string name="modern_settings_increase_volume">Increase keypress volume</string>
+    <string name="modern_settings_decrease_vibration">Shorten vibration duration</string>
+    <string name="modern_settings_increase_vibration">Lengthen vibration duration</string>
+    <string name="modern_settings_percent_format">%1$d%%</string>
+    <string name="modern_settings_milliseconds_format">%1$d ms</string>
+    <string name="modern_settings_value_read_only">%1$s, %2$s, read only</string>
+    <string name="modern_settings_value_adjustable">%1$s, %2$s, adjustable</string>
+    <string name="modern_settings_tplus_stroke_filter_title">Pinyin stroke filter</string>
+    <string name="modern_settings_tplus_stroke_filter_summary">On T+, this turns off glide typing; after candidates appear, draw up to five strokes directly on the keyboard</string>
+</resources>
